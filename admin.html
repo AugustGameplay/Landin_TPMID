@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Totalplay Mérida</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ========== LOGIN SCREEN ========== -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">⚡</div>
+      <h1>Panel Administrativo</h1>
+      <p class="login-sub">Totalplay Mérida — Distribuidor Autorizado</p>
+      <div class="login-error" id="login-error"></div>
+      <form id="login-form">
+        <div class="admin-form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" class="admin-input" placeholder="Ingresa tu contraseña" required autofocus>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Ingresar 🔐</button>
+        <p style="font-size:0.75rem;color:var(--gray-500);margin-top:16px;">Contraseña por defecto: <code>totalplay2026</code></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== ADMIN APP ========== -->
+  <div class="admin-app" id="admin-app">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <div class="admin-header-logo">⚡</div>
+        <h1>Totalplay <span>Admin</span></h1>
+      </div>
+      <div class="admin-header-right">
+        <a href="index.html" target="_blank" class="btn btn-secondary btn-sm">👁️ Ver Landing</a>
+        <button class="btn btn-secondary btn-sm" id="logout-btn">Cerrar Sesión</button>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="tab-packages">📦 Paquetes</button>
+      <button class="admin-tab" data-tab="tab-contact">📇 Contacto</button>
+      <button class="admin-tab" data-tab="tab-testimonials">💬 Testimonios</button>
+      <button class="admin-tab" data-tab="tab-settings">⚙️ Configuración</button>
+    </div>
+
+    <!-- Content -->
+    <div class="admin-content">
+
+      <!-- Preview Bar -->
+      <div class="preview-bar">
+        <p>💡 Los cambios se guardan en este dispositivo. Abre <strong>index.html</strong> para ver la landing actualizada.</p>
+        <a href="index.html" target="_blank" class="btn btn-primary btn-sm">Abrir Landing ↗</a>
+      </div>
+
+      <!-- ===== TAB: PACKAGES ===== -->
+      <div class="tab-panel active" id="tab-packages">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <h2>Paquetes</h2>
+              <p>Administra los paquetes que se muestran en la landing</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openPackageModal()">+ Nuevo Paquete</button>
+          </div>
+          <div class="pkg-list" id="pkg-list">
+            <!-- Rendered by admin.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: CONTACT ===== -->
+      <div class="tab-panel" id="tab-contact">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <h2>Información de Contacto</h2>
+              <p>Datos que se muestran en la landing y se usan para WhatsApp</p>
+            </div>
+          </div>
+
+          <div class="admin-form-row">
+            <div class="admin-form-group">
+              <label for="ct-phone">📞 Teléfono</label>
+              <input type="tel" id="ct-phone" class="admin-input" placeholder="999-123-4567">
+            </div>
+            <div class="admin-form-group">
+              <label for="ct-whatsapp">💬 WhatsApp (con código de país)</label>
+              <input type="text" id="ct-whatsapp" class="admin-input" placeholder="5219991234567">
+            </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label for="ct-email">✉️ Correo electrónico</label>
+            <input type="email" id="ct-email" class="admin-input" placeholder="contacto@ejemplo.com">
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--dark-border);margin:24px 0;">
+
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">Perfil del Asesor</h3>
+
+          <div class="photo-upload">
+            <div class="photo-preview" id="ct-photo-preview">👤</div>
+            <div>
+              <div class="photo-upload-btn">
+                <button class="btn btn-secondary btn-sm">📷 Subir Foto</button>
+                <input type="file" id="ct-photo-input" accept="image/*">
+              </div>
+              <p style="font-size:0.75rem;color:var(--gray-500);margin-top:6px;">JPG o PNG. Se redimensiona automáticamente.</p>
+            </div>
+          </div>
+
+          <div class="admin-form-row" style="margin-top:16px;">
+            <div class="admin-form-group">
+              <label for="ct-name">Nombre del asesor</label>
+              <input type="text" id="ct-name" class="admin-input" placeholder="Nombre completo">
+            </div>
+            <div class="admin-form-group">
+              <label for="ct-title">Título / Cargo</label>
+              <input type="text" id="ct-title" class="admin-input" placeholder="Distribuidor Autorizado">
+            </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label for="ct-bio">Biografía / Mensaje personal</label>
+            <textarea id="ct-bio" class="admin-input" placeholder="¡Hola! Soy tu asesor..."></textarea>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--dark-border);margin:24px 0;">
+
+          <div class="admin-form-row">
+            <div class="admin-form-group">
+              <label for="ct-schedule">🕐 Horario de atención</label>
+              <input type="text" id="ct-schedule" class="admin-input" placeholder="Lunes a Sábado: 9AM - 8PM">
+            </div>
+            <div class="admin-form-group">
+              <label for="ct-address">📍 Ubicación / Zona</label>
+              <input type="text" id="ct-address" class="admin-input" placeholder="Mérida, Yucatán">
+            </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label for="ct-promo">🔥 Texto de promoción (banner superior)</label>
+            <input type="text" id="ct-promo" class="admin-input" placeholder="¡Instalación GRATIS este mes!">
+          </div>
+
+          <div style="margin-top:24px;">
+            <button class="btn btn-primary" onclick="saveContactInfo()">💾 Guardar Contacto</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: TESTIMONIALS ===== -->
+      <div class="tab-panel" id="tab-testimonials">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <h2>Testimonios</h2>
+              <p>Opiniones de clientes que generan confianza</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openTestimonialModal()">+ Nuevo Testimonio</button>
+          </div>
+          <div class="pkg-list" id="testimonials-list">
+            <!-- Rendered by admin.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: SETTINGS ===== -->
+      <div class="tab-panel" id="tab-settings">
+        <!-- Password -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <h2>🔐 Cambiar Contraseña</h2>
+              <p>Actualiza la contraseña de acceso al panel</p>
+            </div>
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-form-group">
+              <label for="new-password">Nueva contraseña</label>
+              <input type="password" id="new-password" class="admin-input" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="admin-form-group">
+              <label for="confirm-password">Confirmar contraseña</label>
+              <input type="password" id="confirm-password" class="admin-input" placeholder="Repite la contraseña">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="handleChangePassword()">Cambiar Contraseña</button>
+        </div>
+
+        <!-- Data Management -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <h2>💾 Respaldo de Datos</h2>
+              <p>Exporta o importa tus datos para no perderlos</p>
+            </div>
+          </div>
+          <div class="data-actions">
+            <button class="btn btn-success btn-sm" onclick="handleExport()">📥 Exportar Todo (JSON)</button>
+            <div style="position:relative;">
+              <button class="btn btn-secondary btn-sm">📤 Importar Datos</button>
+              <input type="file" id="import-file" accept=".json" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="handleResetDefaults()">🔄 Restaurar Valores Originales</button>
+          </div>
+          <p style="font-size:0.78rem;color:var(--gray-500);margin-top:12px;">
+            ⚠️ Los datos se guardan en el navegador de este dispositivo. Exporta regularmente para tener un respaldo.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-app -->
+
+  <!-- ========== PACKAGE MODAL ========== -->
+  <div class="modal-overlay" id="pkg-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="pkg-modal-title">Nuevo Paquete</h2>
+        <button class="modal-close" onclick="closePackageModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="pkg-form" onsubmit="event.preventDefault(); savePackage();">
+          <div class="admin-form-group">
+            <label for="pkg-name">Nombre del paquete *</label>
+            <input type="text" id="pkg-name" class="admin-input" placeholder="Ej: Totalplay Plus" required>
+          </div>
+          <div class="admin-form-row three">
+            <div class="admin-form-group">
+              <label for="pkg-type">Tipo</label>
+              <select id="pkg-type" class="admin-input">
+                <option value="internet">Solo Internet</option>
+                <option value="dobleplay">Doble Play</option>
+                <option value="tripleplay">Triple Play</option>
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label for="pkg-speed">Velocidad (Mbps) *</label>
+              <input type="number" id="pkg-speed" class="admin-input" placeholder="300" required>
+            </div>
+            <div class="admin-form-group">
+              <label for="pkg-price">Precio mensual *</label>
+              <input type="number" id="pkg-price" class="admin-input" placeholder="699" required>
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label for="pkg-channels">Canales (dejar vacío si solo internet)</label>
+            <input type="number" id="pkg-channels" class="admin-input" placeholder="150">
+          </div>
+          <div class="admin-form-group">
+            <label for="pkg-features">Características (una por línea)</label>
+            <textarea id="pkg-features" class="admin-input" rows="4" placeholder="Fibra óptica simétrica&#10;WiFi Mesh incluido&#10;Instalación GRATIS"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label for="pkg-streaming">Streaming incluido (separado por comas)</label>
+            <input type="text" id="pkg-streaming" class="admin-input" placeholder="HBO Max, Prime Video, Netflix">
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-form-group">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="pkg-popular"> ⭐ Marcar como "Más Popular"
+              </label>
+            </div>
+            <div class="admin-form-group">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="pkg-active" checked> ✅ Activo (visible en landing)
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closePackageModal()">Cancelar</button>
+        <button class="btn btn-primary btn-sm" onclick="savePackage()">💾 Guardar Paquete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TESTIMONIAL MODAL ========== -->
+  <div class="modal-overlay" id="test-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="test-modal-title">Nuevo Testimonio</h2>
+        <button class="modal-close" onclick="closeTestimonialModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="test-form" onsubmit="event.preventDefault(); saveTestimonial();">
+          <div class="admin-form-row">
+            <div class="admin-form-group">
+              <label for="test-name">Nombre del cliente *</label>
+              <input type="text" id="test-name" class="admin-input" placeholder="Carlos M." required>
+            </div>
+            <div class="admin-form-group">
+              <label for="test-location">Ubicación</label>
+              <input type="text" id="test-location" class="admin-input" placeholder="Col. Montebello, Mérida">
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label for="test-text">Testimonio *</label>
+            <textarea id="test-text" class="admin-input" rows="3" placeholder="El servicio ha sido excelente..." required></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label for="test-rating">Calificación</label>
+            <select id="test-rating" class="admin-input">
+              <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+              <option value="4">⭐⭐⭐⭐ (4)</option>
+              <option value="3">⭐⭐⭐ (3)</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closeTestimonialModal()">Cancelar</button>
+        <button class="btn btn-primary btn-sm" onclick="saveTestimonial()">💾 Guardar Testimonio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/paquetes.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
