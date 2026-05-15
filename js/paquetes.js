@@ -305,19 +305,23 @@ function getPackages() {
     const stored = localStorage.getItem(DATA_KEYS.packages);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // Invalidate cache if old mock packages are present so real exact info displays automatically
       if (Array.isArray(parsed) && parsed.length > 0) {
+        // Invalidate old mock data
         if (parsed.some(p => p.name === 'Internet Básico' || p.price === 399)) {
           localStorage.removeItem(DATA_KEYS.packages);
         } else {
-          // Ensure category field exists for imported/older customized packages
-          return parsed.map(p => ({
-            ...p,
-            category: p.category || (p.channels ? 'tv' : 'internet'),
-            listPrice: p.listPrice || (p.price + 50),
-            loyaltyPrice: p.loyaltyPrice || (p.price - 30),
-            loyaltyDiscount: p.loyaltyDiscount || 30
-          }));
+          // Force re-save if any package is missing category to fix stale cache
+          const needsFix = parsed.some(p => !p.category);
+          if (needsFix) {
+            localStorage.removeItem(DATA_KEYS.packages);
+          } else {
+            return parsed.map(p => ({
+              ...p,
+              listPrice: p.listPrice || (p.price + 50),
+              loyaltyPrice: p.loyaltyPrice || (p.price - 30),
+              loyaltyDiscount: p.loyaltyDiscount || 30
+            }));
+          }
         }
       }
     }
