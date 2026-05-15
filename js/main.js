@@ -3,6 +3,7 @@
    ============================================================ */
 
 let currentCategory = 'tv';
+let revealObserver = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   initTopbar();
@@ -80,7 +81,7 @@ function renderPackages() {
       }).join('') : '';
 
       return `
-        <div class="pkg-card ${pkg.popular ? 'popular' : ''} reveal">
+        <div class="pkg-card ${pkg.popular ? 'popular' : ''}">
           ${pkg.popular ? '<div class="pkg-popular-badge">⭐ Más Popular</div>' : ''}
           ${pkg.badge ? `<div class="pkg-custom-badge">${pkg.badge}</div>` : ''}
 
@@ -144,6 +145,9 @@ function renderPackages() {
     }).join('');
   }
 
+  // Reveal newly injected cards
+  setTimeout(revealNewCards, 50);
+
   // Populate select in forms
   const selects = document.querySelectorAll('.pkg-select');
   selects.forEach(sel => {
@@ -184,7 +188,7 @@ function renderAdvisor() {
   const waURL = buildWhatsAppURL(contact, '¡Hola! Quisiera información sobre los paquetes de Totalplay.');
 
   section.innerHTML = `
-    <div class="advisor-card reveal">
+    <div class="advisor-card">
       <div class="advisor-photo">${photoHTML}</div>
       <div>
         <div class="advisor-name">${contact.advisorName}</div>
@@ -310,15 +314,31 @@ function initForms() {
 
 /* ---------- SCROLL REVEAL ---------- */
 function initScrollReveal() {
-  const observer = new IntersectionObserver((entries) => {
+  revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+}
+
+/* Re-observe any newly rendered .reveal elements (e.g. after tab switch) */
+function revealNewCards() {
+  if (!revealObserver) return;
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+    revealObserver.observe(el);
+  });
+  // Also immediately show cards already in viewport
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add('visible');
+    }
+  });
 }
 
 /* ---------- PROMO BANNER ---------- */
