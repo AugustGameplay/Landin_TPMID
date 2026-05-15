@@ -2,8 +2,11 @@
    TOTALPLAY MÉRIDA — Landing Page Logic (main.js)
    ============================================================ */
 
+let currentCategory = 'tv';
+
 document.addEventListener('DOMContentLoaded', () => {
   initTopbar();
+  initTabs();
   renderPackages();
   renderTestimonials();
   renderAdvisor();
@@ -16,6 +19,24 @@ document.addEventListener('DOMContentLoaded', () => {
   initCounters();
   renderWhatsAppFloat();
 });
+
+/* ---------- CATEGORY TABS ---------- */
+function initTabs() {
+  const tabs = document.querySelectorAll('.pkg-tab-btn');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentCategory = tab.dataset.category;
+      
+      const addonBanner = document.getElementById('addon-banner-tv');
+      if (addonBanner) {
+        addonBanner.style.display = (currentCategory === 'tv') ? 'block' : 'none';
+      }
+      renderPackages();
+    });
+  });
+}
 
 /* ---------- TOPBAR SCROLL ---------- */
 function initTopbar() {
@@ -30,52 +51,107 @@ function initTopbar() {
 function renderPackages() {
   const grid = document.getElementById('packages-grid');
   if (!grid) return;
-  const packages = getPackages().filter(p => p.active).sort((a, b) => a.order - b.order);
+  
+  const allPackages = getPackages().sort((a, b) => a.order - b.order);
+  const filtered = allPackages.filter(p => p.active && p.category === currentCategory);
+  
   const contact = getContact();
 
-  grid.innerHTML = packages.map(pkg => {
-    const typeLabels = {
-      internet: 'Solo Internet',
-      dobleplay: 'Doble Play',
-      tripleplay: 'Triple Play'
-    };
-    const waMsg = `¡Hola! Me interesa el paquete *${pkg.name}* de $${pkg.price}/mes. ¿Me pueden dar más información?`;
-    const waURL = buildWhatsAppURL(contact, waMsg);
+  if (filtered.length === 0) {
+    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--gray-400);">No hay paquetes disponibles en esta categoría en este momento.</p>';
+  } else {
+    grid.innerHTML = filtered.map(pkg => {
+      const waMsg = `¡Hola! Me interesa el paquete *${pkg.name}* ($${pkg.price}/mes, ${pkg.speed} Mbps). ¿Me pueden dar más información?`;
+      const waURL = buildWhatsAppURL(contact, waMsg);
+      const listPrice = pkg.listPrice || (pkg.price + 50);
+      const loyaltyPrice = pkg.loyaltyPrice || (pkg.price - 30);
+      const loyaltyDiscount = pkg.loyaltyDiscount || 30;
+      const catLabel = pkg.category === 'tv' ? 'TV + Internet' : 'Solo Internet';
 
-    return `
-      <div class="pkg-card ${pkg.popular ? 'popular' : ''} reveal">
-        ${pkg.popular ? '<div class="pkg-popular-badge">Más Popular</div>' : ''}
-        <div class="pkg-type">${typeLabels[pkg.type] || pkg.type}</div>
-        <div class="pkg-name">${pkg.name}</div>
-        <div class="pkg-price">
-          <span class="currency">$</span>
-          <span class="amount">${pkg.price}</span>
-          <span class="period">/mes</span>
-        </div>
-        <div class="pkg-speed">
-          ⚡ <strong>${pkg.speed} Mbps</strong>&nbsp;simétricos
-          ${pkg.channels ? ` &nbsp;|&nbsp; 📺 ${pkg.channels}+ canales` : ''}
-        </div>
-        <ul class="pkg-features">
-          ${pkg.features.map(f => `<li>${f}</li>`).join('')}
-        </ul>
-        ${pkg.streaming && pkg.streaming.length > 0 ? `
-          <div class="pkg-streaming">
-            ${pkg.streaming.map(s => `<span>${s}</span>`).join('')}
+      // Build streaming chips
+      const streamingHTML = (pkg.streaming && pkg.streaming.length > 0) ? pkg.streaming.map(s => {
+        let icon = '🎬';
+        let cls = '';
+        if (s.toLowerCase().includes('netflix')) { icon = '🔴'; cls = 'chip-netflix'; }
+        else if (s.toLowerCase().includes('hbo')) { icon = '🟣'; cls = 'chip-hbo'; }
+        else if (s.toLowerCase().includes('apple')) { icon = '⚫'; cls = 'chip-apple'; }
+        const isIncluded = s.toLowerCase().includes('incluido');
+        return `<div class="streaming-chip ${cls} ${isIncluded ? 'chip-included' : ''}">${icon} ${s}</div>`;
+      }).join('') : '';
+
+      return `
+        <div class="pkg-card ${pkg.popular ? 'popular' : ''} reveal">
+          ${pkg.popular ? '<div class="pkg-popular-badge">⭐ Más Popular</div>' : ''}
+          ${pkg.badge ? `<div class="pkg-custom-badge">${pkg.badge}</div>` : ''}
+
+          <div class="pkg-category-label">${catLabel}</div>
+
+          <div class="pkg-speed-hero">
+            <span class="speed-number">${pkg.speed}</span>
+            <div class="speed-meta">
+              <span class="speed-unit">Mbps</span>
+              <span class="speed-type">Simétricos</span>
+            </div>
           </div>
-        ` : ''}
-        <a href="${waURL}" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%">
-          ¡Lo Quiero! 🚀
-        </a>
-      </div>
-    `;
-  }).join('');
 
-  // Also populate select in forms
+          ${pkg.channels ? '<div class="pkg-channels-badge">📺 +190 canales (124 HD)</div>' : ''}
+
+          <div class="pkg-price-section">
+            <div class="pkg-main-price-box">
+              <div class="price-label-badge">💰 Precio Pronto Pago</div>
+              <div class="pkg-price">
+                <span class="currency">$</span>
+                <span class="amount">${pkg.price}</span>
+                <span class="period">/mes</span>
+              </div>
+              <div class="price-hint">Pagando los primeros 10 días tras tu corte</div>
+            </div>
+
+            <div class="pkg-secondary-price-box">
+              <div class="sec-price-row">
+                <span class="sec-label">📋 Precio de lista:</span>
+                <span class="sec-val line-through">$${listPrice}/mes</span>
+              </div>
+              <div class="sec-price-row highlight">
+                <span class="sec-label">🎁 A partir del 6° mes:</span>
+                <span class="sec-val font-bold">$${loyaltyPrice}/mes</span>
+              </div>
+              <div class="sec-discount-hint">Ahorro permanente de $${loyaltyDiscount} al mes por lealtad</div>
+            </div>
+          </div>
+
+          <div class="pkg-includes-section">
+            <div class="pkg-includes-title">✅ Incluye:</div>
+            <ul class="pkg-features">
+              ${pkg.features.map(f => `<li>${f}</li>`).join('')}
+            </ul>
+          </div>
+
+          ${streamingHTML ? `
+            <div class="pkg-streaming-section">
+              <div class="pkg-streaming-title">🎬 Plataformas de Streaming:</div>
+              <div class="pkg-streaming-chips">
+                ${streamingHTML}
+              </div>
+            </div>
+          ` : ''}
+
+          <a href="${waURL}" target="_blank" rel="noopener" class="btn btn-whatsapp pkg-cta-btn">
+            💬 ¡Lo quiero! Contratar por WhatsApp
+          </a>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Populate select in forms
   const selects = document.querySelectorAll('.pkg-select');
   selects.forEach(sel => {
-    const opts = packages.map(p => `<option value="${p.name}">${p.name} — $${p.price}/mes</option>`).join('');
-    sel.innerHTML = '<option value="">Selecciona un paquete...</option>' + opts;
+    const opts = allPackages.filter(p => p.active).map(p => {
+      const catLabel = p.category === 'tv' ? 'TV+Internet' : 'Solo Internet';
+      return `<option value="${p.name} (${catLabel})">${p.name} (${catLabel}) — $${p.price}/mes</option>`;
+    }).join('');
+    sel.innerHTML = '<option value="">Selecciona un paquete oficial...</option>' + opts;
   });
 }
 
@@ -114,8 +190,9 @@ function renderAdvisor() {
         <div class="advisor-name">${contact.advisorName}</div>
         <div class="advisor-title">${contact.advisorTitle}</div>
         <p class="advisor-bio">${contact.advisorBio}</p>
-        <div class="advisor-contact">
-          <a href="tel:${contact.phone}" class="btn btn-secondary btn-sm">📞 ${contact.phone}</a>
+        <div class="advisor-contact" style="flex-wrap:wrap;gap:8px;">
+          <a href="tel:${contact.phone}" class="btn btn-secondary btn-sm" title="Teléfono Principal">📞 ${contact.phone}</a>
+          ${contact.phoneSecondary ? `<a href="tel:${contact.phoneSecondary}" class="btn btn-secondary btn-sm" title="Teléfono Secundario">📞 ${contact.phoneSecondary}</a>` : ''}
           <a href="${waURL}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm">💬 WhatsApp</a>
           <a href="mailto:${contact.email}" class="btn btn-secondary btn-sm">✉️ Email</a>
         </div>
@@ -135,8 +212,9 @@ function renderContactInfo() {
     <div class="contact-info-item">
       <div class="contact-icon">📞</div>
       <div>
-        <h4>Teléfono</h4>
-        <p><a href="tel:${contact.phone}">${contact.phone}</a></p>
+        <h4>Teléfonos de atención</h4>
+        <p><a href="tel:${contact.phone}">${contact.phone}</a> (Principal)</p>
+        ${contact.phoneSecondary ? `<p style="margin-top:4px;"><a href="tel:${contact.phoneSecondary}">${contact.phoneSecondary}</a> (Secundario)</p>` : ''}
       </div>
     </div>
     <div class="contact-info-item">

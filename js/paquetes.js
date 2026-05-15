@@ -14,115 +14,244 @@ const DATA_KEYS = {
 /* ---------- DEFAULT DATA ---------- */
 
 const DEFAULT_PACKAGES = [
+  // ================= TOTALPLAY TV + INTERNET =================
   {
-    id: 'pkg-1',
-    name: 'Internet Básico',
-    type: 'internet',
-    speed: 100,
+    id: 'pkg-tv-150',
+    name: '150 Megas Simétricos',
+    category: 'tv',
+    type: 'tripleplay',
+    speed: 150,
     channels: null,
-    price: 399,
+    price: 599,
+    listPrice: 649,
+    loyaltyPrice: 569,
+    loyaltyDiscount: 30,
     features: [
-      'Fibra óptica simétrica',
-      'Modem WiFi 6 incluido',
-      'Sin contrato forzoso',
-      'Soporte técnico 24/7'
+      '✅ Totalplay TV',
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica'
     ],
-    streaming: ['HBO Max'],
+    streaming: ['Netflix básico con anuncios (5 meses)', 'HBO Max básico con anuncios (5 meses)', 'Apple TV+ (3 meses)'],
+    badge: '',
     popular: false,
     active: true,
     order: 0
   },
   {
-    id: 'pkg-2',
-    name: 'Doble Play',
-    type: 'dobleplay',
-    speed: 200,
-    channels: 100,
-    price: 549,
+    id: 'pkg-tv-250',
+    name: '250 Megas Simétricos',
+    category: 'tv',
+    type: 'tripleplay',
+    speed: 250,
+    channels: null,
+    price: 699,
+    listPrice: 749,
+    loyaltyPrice: 669,
+    loyaltyDiscount: 30,
     features: [
-      'Fibra óptica simétrica',
-      'TV HD en todos tus dispositivos',
-      'Modem WiFi 6 incluido',
-      'Instalación en 24-48 hrs'
+      '✅ Totalplay TV',
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica'
     ],
-    streaming: ['HBO Max', 'Prime Video'],
+    streaming: ['Netflix básico con anuncios (5 meses)', 'HBO Max básico con anuncios (5 meses)', 'Apple TV+ (3 meses)'],
+    badge: '',
     popular: false,
     active: true,
     order: 1
   },
   {
-    id: 'pkg-3',
-    name: 'Totalplay Plus',
+    id: 'pkg-tv-350',
+    name: '350 Megas Simétricos',
+    category: 'tv',
     type: 'tripleplay',
-    speed: 300,
-    channels: 150,
-    price: 699,
+    speed: 350,
+    channels: null,
+    price: 799,
+    listPrice: 849,
+    loyaltyPrice: 759,
+    loyaltyDiscount: 40,
     features: [
-      'Fibra óptica simétrica',
-      '150+ canales HD y 4K',
-      'Línea telefónica incluida',
-      'WiFi Mesh para toda tu casa',
-      'Instalación GRATIS'
+      '✅ Totalplay TV',
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica'
     ],
-    streaming: ['HBO Max', 'Prime Video', 'Paramount+'],
+    streaming: ['Netflix básico con anuncios (5 meses)', 'HBO Max básico con anuncios (5 meses)', 'Apple TV+ (3 meses)'],
+    badge: '',
     popular: true,
     active: true,
     order: 2
   },
   {
-    id: 'pkg-4',
-    name: 'Totalplay Premium',
+    id: 'pkg-tv-500',
+    name: '500 Megas Simétricos',
+    category: 'tv',
     type: 'tripleplay',
     speed: 500,
-    channels: 200,
-    price: 899,
+    channels: 190,
+    price: 999,
+    listPrice: 1049,
+    loyaltyPrice: 949,
+    loyaltyDiscount: 50,
     features: [
-      'Fibra óptica simétrica',
-      '200+ canales HD y 4K',
-      'Línea telefónica incluida',
-      'WiFi Mesh para toda tu casa',
-      'Totalplay GO incluido',
-      'Instalación GRATIS',
-      'Soporte VIP prioritario'
+      '✅ Totalplay TV + Nuevo Totalplay TV',
+      '📺 +190 canales (124 HD)',
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica'
     ],
-    streaming: ['HBO Max', 'Prime Video', 'Paramount+', 'Netflix Estándar'],
+    streaming: ['Netflix básico con anuncios (5 meses)', 'HBO Max básico con anuncios (5 meses)', 'Apple TV+ (3 meses)'],
+    badge: '⚽ ¡Paquete futbolero!',
     popular: false,
     active: true,
     order: 3
   },
   {
-    id: 'pkg-5',
-    name: 'Totalplay Max',
+    id: 'pkg-tv-1000',
+    name: '1000 Megas Simétricos',
+    category: 'tv',
     type: 'tripleplay',
     speed: 1000,
-    channels: 250,
-    price: 1299,
+    channels: 190,
+    price: 1640,
+    listPrice: 1720,
+    loyaltyPrice: 1540,
+    loyaltyDiscount: 100,
     features: [
-      '1 Gbps simétrico real',
-      '250+ canales HD, 4K y 8K',
-      'Línea telefónica ilimitada',
-      'WiFi Mesh Pro (3 nodos)',
-      'Totalplay GO incluido',
-      'Instalación y activación GRATIS',
-      'Asesor personal dedicado'
+      '✅ Totalplay TV + Nuevo Totalplay TV',
+      '📺 +190 canales (124 HD)',
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica simétrica 1 Gbps'
     ],
-    streaming: ['HBO Max', 'Prime Video', 'Paramount+', 'Netflix Premium', 'Disney+'],
+    streaming: ['Netflix básico con anuncios (INCLUIDO permanente)', 'HBO Max básico con anuncios (INCLUIDO permanente)', 'Apple TV+ (3 meses)'],
+    badge: '🔊 ¡Surround incluido!',
     popular: false,
     active: true,
     order: 4
+  },
+
+  // ================= TOTALPLAY INTERNET (Solo Internet) =================
+  {
+    id: 'pkg-int-150',
+    name: '150 Megas Simétricos',
+    category: 'internet',
+    type: 'internet',
+    speed: 150,
+    channels: null,
+    price: 460,
+    listPrice: 510,
+    loyaltyPrice: 440,
+    loyaltyDiscount: 20,
+    features: [
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica',
+      '📶 Modem WiFi incluido'
+    ],
+    streaming: ['Netflix básico con anuncios (3 meses)', 'HBO Max básico con anuncios (3 meses)', 'Apple TV+ (3 meses)'],
+    badge: '',
+    popular: false,
+    active: true,
+    order: 5
+  },
+  {
+    id: 'pkg-int-250',
+    name: '250 Megas Simétricos',
+    category: 'internet',
+    type: 'internet',
+    speed: 250,
+    channels: null,
+    price: 559,
+    listPrice: 609,
+    loyaltyPrice: 539,
+    loyaltyDiscount: 20,
+    features: [
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica',
+      '📶 Modem WiFi incluido'
+    ],
+    streaming: ['Netflix básico con anuncios (3 meses)', 'HBO Max básico con anuncios (3 meses)', 'Apple TV+ (3 meses)'],
+    badge: '',
+    popular: false,
+    active: true,
+    order: 6
+  },
+  {
+    id: 'pkg-int-350',
+    name: '350 Megas Simétricos',
+    category: 'internet',
+    type: 'internet',
+    speed: 350,
+    channels: null,
+    price: 669,
+    listPrice: 719,
+    loyaltyPrice: 639,
+    loyaltyDiscount: 30,
+    features: [
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica',
+      '📶 Modem WiFi incluido'
+    ],
+    streaming: ['Netflix básico con anuncios (5 meses)', 'HBO Max básico con anuncios (5 meses)', 'Apple TV+ (3 meses)'],
+    badge: '',
+    popular: false,
+    active: true,
+    order: 7
+  },
+  {
+    id: 'pkg-int-500',
+    name: '500 Megas Simétricos',
+    category: 'internet',
+    type: 'internet',
+    speed: 500,
+    channels: null,
+    price: 830,
+    listPrice: 880,
+    loyaltyPrice: 770,
+    loyaltyDiscount: 60,
+    features: [
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica 100% simétrica',
+      '📶 Modem WiFi incluido'
+    ],
+    streaming: ['Netflix básico con anuncios (5 meses)', 'HBO Max básico con anuncios (5 meses)', 'Apple TV+ (3 meses)'],
+    badge: '',
+    popular: false,
+    active: true,
+    order: 8
+  },
+  {
+    id: 'pkg-int-1000',
+    name: '1000 Megas Simétricos',
+    category: 'internet',
+    type: 'internet',
+    speed: 1000,
+    channels: null,
+    price: 1470,
+    listPrice: 1550,
+    loyaltyPrice: 1390,
+    loyaltyDiscount: 80,
+    features: [
+      '📞 Línea Telefónica y App Totalplay',
+      '🌐 Fibra óptica simétrica 1 Gbps',
+      '📶 Modem WiFi incluido'
+    ],
+    streaming: ['Netflix básico con anuncios (INCLUIDO permanente)', 'HBO Max básico con anuncios (INCLUIDO permanente)', 'Apple TV+ (3 meses)'],
+    badge: '',
+    popular: false,
+    active: true,
+    order: 9
   }
 ];
 
 const DEFAULT_CONTACT = {
-  phone: '999-000-0000',
-  whatsapp: '5219990000000',
-  email: 'contacto@ejemplo.com',
+  phone: '990 194 5673',
+  phoneSecondary: '999 433 6427',
+  whatsapp: '5219901945673',
+  email: 'Totalplay.contrataciones.mid@gmail.com',
   advisorName: 'Tu Asesor Totalplay',
   advisorTitle: 'Distribuidor Autorizado',
   advisorBio: '¡Hola! Soy tu asesor certificado de Totalplay en Mérida. Estoy aquí para ayudarte a encontrar el paquete perfecto para tu hogar o negocio. ¡Contáctame sin compromiso!',
   advisorPhoto: null,
-  schedule: 'Lunes a Sábado: 9:00 AM - 8:00 PM',
-  address: 'Mérida, Yucatán, México',
+  schedule: 'Lunes a Sábado de 9:00 AM a 8:00 PM',
+  address: 'Calle 17 #299, City 32, Fundadora Montello, CP 97113, Mérida Yucatán',
   promoText: '🔥 ¡Instalación GRATIS + Router WiFi 6 de regalo este mes!'
 };
 
@@ -176,7 +305,21 @@ function getPackages() {
     const stored = localStorage.getItem(DATA_KEYS.packages);
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      // Invalidate cache if old mock packages are present so real exact info displays automatically
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        if (parsed.some(p => p.name === 'Internet Básico' || p.price === 399)) {
+          localStorage.removeItem(DATA_KEYS.packages);
+        } else {
+          // Ensure category field exists for imported/older customized packages
+          return parsed.map(p => ({
+            ...p,
+            category: p.category || (p.channels ? 'tv' : 'internet'),
+            listPrice: p.listPrice || (p.price + 50),
+            loyaltyPrice: p.loyaltyPrice || (p.price - 30),
+            loyaltyDiscount: p.loyaltyDiscount || 30
+          }));
+        }
+      }
     }
   } catch (e) { /* fall through to defaults */ }
   return JSON.parse(JSON.stringify(DEFAULT_PACKAGES));

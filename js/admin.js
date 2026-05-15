@@ -156,11 +156,18 @@ function savePackage() {
   if (editId) {
     const idx = packages.findIndex(p => p.id === editId);
     if (idx !== -1) {
-      pkgData.order = packages[idx].order;
+      const oldPkg = packages[idx];
+      pkgData.order = oldPkg.order;
+      pkgData.category = oldPkg.category;
+      pkgData.listPrice = oldPkg.listPrice;
+      pkgData.loyaltyPrice = oldPkg.loyaltyPrice;
+      pkgData.loyaltyDiscount = oldPkg.loyaltyDiscount;
+      pkgData.badge = oldPkg.badge;
       packages[idx] = pkgData;
     }
   } else {
     pkgData.order = packages.length;
+    pkgData.category = pkgData.channels ? 'tv' : 'internet';
     packages.push(pkgData);
   }
 
@@ -198,6 +205,8 @@ function deletePackage(id) {
 function loadContactForm() {
   const contact = getContact();
   document.getElementById('ct-phone').value = contact.phone || '';
+  const phoneSecEl = document.getElementById('ct-phone-sec');
+  if (phoneSecEl) phoneSecEl.value = contact.phoneSecondary || '';
   document.getElementById('ct-whatsapp').value = contact.whatsapp || '';
   document.getElementById('ct-email').value = contact.email || '';
   document.getElementById('ct-name').value = contact.advisorName || '';
@@ -236,8 +245,10 @@ function loadContactForm() {
 
 function saveContactInfo() {
   const preview = document.getElementById('ct-photo-preview');
+  const phoneSecEl = document.getElementById('ct-phone-sec');
   const contact = {
     phone: document.getElementById('ct-phone').value.trim(),
+    phoneSecondary: phoneSecEl ? phoneSecEl.value.trim() : '',
     whatsapp: document.getElementById('ct-whatsapp').value.trim(),
     email: document.getElementById('ct-email').value.trim(),
     advisorName: document.getElementById('ct-name').value.trim(),
