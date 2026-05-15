@@ -8,8 +8,21 @@ const DATA_KEYS = {
   contact: 'tp_contact',
   testimonials: 'tp_testimonials',
   password: 'tp_admin_pwd',
-  privacyAccepted: 'tp_privacy'
+  privacyAccepted: 'tp_privacy',
+  version: 'tp_data_version'
 };
+
+// Bump this version any time DEFAULT_PACKAGES structure changes
+// It forces a cache-bust so users always see fresh data
+const DATA_VERSION = '2026-05-15-v4';
+
+(function checkDataVersion() {
+  const stored = localStorage.getItem(DATA_KEYS.version);
+  if (stored !== DATA_VERSION) {
+    localStorage.removeItem(DATA_KEYS.packages);
+    localStorage.setItem(DATA_KEYS.version, DATA_VERSION);
+  }
+})();
 
 /* ---------- DEFAULT DATA ---------- */
 
