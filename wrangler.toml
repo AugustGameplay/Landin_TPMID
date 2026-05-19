@@ -3,3 +3,7 @@ compatibility_date = "2024-01-01"
 
 [assets]
 directory = "./"
+
+[[kv_namespaces]]
+binding = "TP_DATA"
+id = "PLACEHOLDER_ID"

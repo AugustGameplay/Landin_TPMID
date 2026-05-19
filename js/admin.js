@@ -1,5 +1,6 @@
 /* ============================================================
    TOTALPLAY MÉRIDA — Admin Panel Logic (admin.js)
+   Now uses async API calls via paquetes.js data layer
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,11 +17,11 @@ function initLogin() {
   const loginError = document.getElementById('login-error');
   const logoutBtn = document.getElementById('logout-btn');
 
-  // Check session
-  if (sessionStorage.getItem('tp_admin_auth') === 'true') {
+  // Check session — if we have a token, load data and show app
+  if (sessionStorage.getItem('tp_admin_token')) {
     loginScreen.style.display = 'none';
     adminApp.classList.add('active');
-    loadAllSections();
+    initAdminData();
   }
 
   if (loginForm) {
@@ -29,10 +30,9 @@ function initLogin() {
       const pwd = document.getElementById('login-password').value;
       const valid = await verifyPassword(pwd);
       if (valid) {
-        sessionStorage.setItem('tp_admin_auth', 'true');
         loginScreen.style.display = 'none';
         adminApp.classList.add('active');
-        loadAllSections();
+        initAdminData();
         adminToast('¡Bienvenido al panel de administración!', 'success');
       } else {
         loginError.classList.add('show');
@@ -43,9 +43,20 @@ function initLogin() {
 
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('tp_admin_auth');
+      sessionStorage.removeItem('tp_admin_token');
       location.reload();
     });
+  }
+}
+
+// Load data from API then render all sections
+async function initAdminData() {
+  try {
+    await loadSiteData();
+    loadAllSections();
+  } catch (e) {
+    adminToast('Error al cargar datos: ' + e.message, 'error');
+    loadAllSections(); // try with defaults
   }
 }
 
@@ -125,7 +136,7 @@ function closePackageModal() {
   document.getElementById('pkg-modal').classList.remove('active');
 }
 
-function savePackage() {
+async function savePackage() {
   const form = document.getElementById('pkg-form');
   const editId = form.dataset.editId;
   const packages = getPackages();
@@ -171,10 +182,14 @@ function savePackage() {
     packages.push(pkgData);
   }
 
-  savePackages(packages);
-  renderPackageList();
-  closePackageModal();
-  adminToast(editId ? 'Paquete actualizado ✅' : 'Paquete creado ✅', 'success');
+  try {
+    await savePackages(packages);
+    renderPackageList();
+    closePackageModal();
+    adminToast(editId ? 'Paquete actualizado ✅' : 'Paquete creado ✅', 'success');
+  } catch (e) {
+    adminToast('Error al guardar: ' + e.message, 'error');
+  }
 }
 
 function editPackage(id) {
@@ -182,23 +197,31 @@ function editPackage(id) {
   if (pkg) openPackageModal(pkg);
 }
 
-function togglePackage(id) {
+async function togglePackage(id) {
   const packages = getPackages();
   const pkg = packages.find(p => p.id === id);
   if (pkg) {
     pkg.active = !pkg.active;
-    savePackages(packages);
-    renderPackageList();
-    adminToast(pkg.active ? 'Paquete activado' : 'Paquete desactivado', 'info');
+    try {
+      await savePackages(packages);
+      renderPackageList();
+      adminToast(pkg.active ? 'Paquete activado' : 'Paquete desactivado', 'info');
+    } catch (e) {
+      adminToast('Error: ' + e.message, 'error');
+    }
   }
 }
 
-function deletePackage(id) {
+async function deletePackage(id) {
   if (!confirm('¿Estás seguro de que quieres eliminar este paquete?')) return;
   const packages = getPackages().filter(p => p.id !== id);
-  savePackages(packages);
-  renderPackageList();
-  adminToast('Paquete eliminado', 'success');
+  try {
+    await savePackages(packages);
+    renderPackageList();
+    adminToast('Paquete eliminado', 'success');
+  } catch (e) {
+    adminToast('Error: ' + e.message, 'error');
+  }
 }
 
 /* ==================== CONTACT INFO ==================== */
@@ -243,7 +266,7 @@ function loadContactForm() {
   }
 }
 
-function saveContactInfo() {
+async function saveContactInfo() {
   const preview = document.getElementById('ct-photo-preview');
   const phoneSecEl = document.getElementById('ct-phone-sec');
   const contact = {
@@ -265,8 +288,12 @@ function saveContactInfo() {
     return;
   }
 
-  saveContact(contact);
-  adminToast('Información de contacto guardada ✅', 'success');
+  try {
+    await saveContact(contact);
+    adminToast('Información de contacto guardada ✅', 'success');
+  } catch (e) {
+    adminToast('Error al guardar: ' + e.message, 'error');
+  }
 }
 
 /* ==================== TESTIMONIALS ==================== */
@@ -315,7 +342,7 @@ function closeTestimonialModal() {
   document.getElementById('test-modal').classList.remove('active');
 }
 
-function saveTestimonial() {
+async function saveTestimonial() {
   const form = document.getElementById('test-form');
   const editId = form.dataset.editId;
   const testimonials = getTestimonials();
@@ -346,10 +373,14 @@ function saveTestimonial() {
     testimonials.push(tData);
   }
 
-  saveTestimonials(testimonials);
-  loadTestimonialsList();
-  closeTestimonialModal();
-  adminToast(editId ? 'Testimonio actualizado ✅' : 'Testimonio creado ✅', 'success');
+  try {
+    await saveTestimonials(testimonials);
+    loadTestimonialsList();
+    closeTestimonialModal();
+    adminToast(editId ? 'Testimonio actualizado ✅' : 'Testimonio creado ✅', 'success');
+  } catch (e) {
+    adminToast('Error: ' + e.message, 'error');
+  }
 }
 
 function editTestimonial(id) {
@@ -357,23 +388,31 @@ function editTestimonial(id) {
   if (t) openTestimonialModal(t);
 }
 
-function toggleTestimonial(id) {
+async function toggleTestimonial(id) {
   const testimonials = getTestimonials();
   const t = testimonials.find(t => t.id === id);
   if (t) {
     t.active = !t.active;
-    saveTestimonials(testimonials);
-    loadTestimonialsList();
-    adminToast(t.active ? 'Testimonio activado' : 'Testimonio desactivado', 'info');
+    try {
+      await saveTestimonials(testimonials);
+      loadTestimonialsList();
+      adminToast(t.active ? 'Testimonio activado' : 'Testimonio desactivado', 'info');
+    } catch (e) {
+      adminToast('Error: ' + e.message, 'error');
+    }
   }
 }
 
-function deleteTestimonial(id) {
+async function deleteTestimonial(id) {
   if (!confirm('¿Eliminar este testimonio?')) return;
   const testimonials = getTestimonials().filter(t => t.id !== id);
-  saveTestimonials(testimonials);
-  loadTestimonialsList();
-  adminToast('Testimonio eliminado', 'success');
+  try {
+    await saveTestimonials(testimonials);
+    loadTestimonialsList();
+    adminToast('Testimonio eliminado', 'success');
+  } catch (e) {
+    adminToast('Error: ' + e.message, 'error');
+  }
 }
 
 /* ==================== PASSWORD ==================== */
@@ -394,10 +433,14 @@ async function handleChangePassword() {
     return;
   }
 
-  await changePassword(newPwd);
-  document.getElementById('new-password').value = '';
-  document.getElementById('confirm-password').value = '';
-  adminToast('Contraseña actualizada ✅', 'success');
+  try {
+    await changePassword(newPwd);
+    document.getElementById('new-password').value = '';
+    document.getElementById('confirm-password').value = '';
+    adminToast('Contraseña actualizada ✅', 'success');
+  } catch (e) {
+    adminToast('Error: ' + e.message, 'error');
+  }
 }
 
 /* ==================== DATA MANAGEMENT ==================== */
@@ -408,8 +451,8 @@ function initDataManagement() {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        const result = importAllData(ev.target.result);
+      reader.onload = async (ev) => {
+        const result = await importAllData(ev.target.result);
         if (result.success) {
           adminToast('Datos importados correctamente ✅', 'success');
           loadAllSections();
@@ -428,13 +471,15 @@ function handleExport() {
   adminToast('Datos exportados ✅', 'success');
 }
 
-function handleResetDefaults() {
+async function handleResetDefaults() {
   if (!confirm('¿Estás seguro? Esto restaurará TODOS los datos a los valores originales. Esta acción no se puede deshacer.')) return;
-  localStorage.removeItem(DATA_KEYS.packages);
-  localStorage.removeItem(DATA_KEYS.contact);
-  localStorage.removeItem(DATA_KEYS.testimonials);
-  loadAllSections();
-  adminToast('Datos restaurados a valores predeterminados', 'success');
+  try {
+    await resetToDefaults();
+    loadAllSections();
+    adminToast('Datos restaurados a valores predeterminados', 'success');
+  } catch (e) {
+    adminToast('Error: ' + e.message, 'error');
+  }
 }
 
 /* ==================== TOAST ==================== */

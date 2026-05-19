@@ -5,7 +5,10 @@
 let currentCategory = 'tv';
 let revealObserver = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load data from Cloudflare KV API before rendering
+  await loadSiteData();
+
   initTopbar();
   initTabs();
   renderPackages();

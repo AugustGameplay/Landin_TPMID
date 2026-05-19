@@ -1,25 +1,9 @@
 /* ============================================================
-   TOTALPLAY MÉRIDA — Data Layer (paquetes.js)
-   Manages packages, contact info, testimonials via Cloudflare KV API
-   Falls back to localStorage if API is unavailable (local dev)
+   TOTALPLAY MÉRIDA — Cloudflare Pages Function API
+   Handles GET/POST for site data stored in KV
    ============================================================ */
 
-const API_URL = '/api/data';
-
-// In-memory cache so we don't refetch on every call within same page load
-let _cache = { packages: null, contact: null, testimonials: null, loaded: false };
-
-// Admin auth token (stored in sessionStorage after login)
-function getAdminToken() {
-  return sessionStorage.getItem('tp_admin_token') || '';
-}
-
-function setAdminToken(token) {
-  sessionStorage.setItem('tp_admin_token', token);
-}
-
-/* ========== DEFAULT DATA (fallback if API is down) ========== */
-
+// Default data (same as paquetes.js defaults) — used to seed KV on first request
 const DEFAULT_PACKAGES = [
   {
     id: 'pkg-tv-150', name: '150 Megas Simétricos', category: 'tv', type: 'tripleplay',
@@ -114,192 +98,143 @@ const DEFAULT_TESTIMONIALS = [
   { id: 'test-4', name: 'Ana P.', location: 'Fracc. Altabrisa, Mérida', text: 'Lo mejor es que incluye HBO Max y varias plataformas. Ya no pago servicios extra de streaming. ¡Todo en un solo paquete!', rating: 4, active: true }
 ];
 
-/* ========== FETCH DATA FROM API ========== */
+const DEFAULT_PASSWORD_HASH = null; // computed on first use
 
-async function loadSiteData() {
-  if (_cache.loaded) return _cache;
+// CORS headers
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Token',
+  'Content-Type': 'application/json'
+};
+
+// Helper: get value from KV or return default
+async function kvGet(kv, key, defaultValue) {
+  const val = await kv.get(key, 'json');
+  if (val !== null && val !== undefined) return val;
+  // Seed the default into KV
+  await kv.put(key, JSON.stringify(defaultValue));
+  return defaultValue;
+}
+
+// ---------- GET: return all site data ----------
+export async function onRequestGet(context) {
+  const { env } = context;
+  const kv = env.TP_DATA;
+
   try {
-    const resp = await fetch(API_URL);
-    if (!resp.ok) throw new Error('API error');
-    const data = await resp.json();
-    _cache.packages = data.packages || DEFAULT_PACKAGES;
-    _cache.contact = data.contact || DEFAULT_CONTACT;
-    _cache.testimonials = data.testimonials || DEFAULT_TESTIMONIALS;
-    _cache.loaded = true;
-  } catch (e) {
-    console.warn('API unavailable, using defaults:', e.message);
-    _cache.packages = JSON.parse(JSON.stringify(DEFAULT_PACKAGES));
-    _cache.contact = JSON.parse(JSON.stringify(DEFAULT_CONTACT));
-    _cache.testimonials = JSON.parse(JSON.stringify(DEFAULT_TESTIMONIALS));
-    _cache.loaded = true;
+    const [packages, contact, testimonials] = await Promise.all([
+      kvGet(kv, 'packages', DEFAULT_PACKAGES),
+      kvGet(kv, 'contact', DEFAULT_CONTACT),
+      kvGet(kv, 'testimonials', DEFAULT_TESTIMONIALS)
+    ]);
+
+    return new Response(JSON.stringify({ packages, contact, testimonials }), {
+      status: 200,
+      headers: CORS
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: CORS
+    });
   }
-  return _cache;
 }
 
-/* ========== SYNC GETTERS (return cached data) ========== */
+// ---------- POST: update specific data ----------
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  const kv = env.TP_DATA;
 
-function getPackages() {
-  return _cache.packages || JSON.parse(JSON.stringify(DEFAULT_PACKAGES));
+  try {
+    const body = await request.json();
+    const { type, data, password, newPassword } = body;
+
+    // Verify admin password for write operations
+    if (type !== 'verify_password') {
+      const token = request.headers.get('X-Admin-Token');
+      if (!token) {
+        return new Response(JSON.stringify({ error: 'No autorizado' }), {
+          status: 401,
+          headers: CORS
+        });
+      }
+      // Verify the token matches stored hash
+      const storedHash = await kv.get('admin_password');
+      const defaultHash = await hashPassword('totalplay2026');
+      const validHash = storedHash || defaultHash;
+      if (token !== validHash) {
+        return new Response(JSON.stringify({ error: 'Token inválido' }), {
+          status: 403,
+          headers: CORS
+        });
+      }
+    }
+
+    switch (type) {
+      case 'verify_password': {
+        const inputHash = await hashPassword(password);
+        const storedHash = await kv.get('admin_password');
+        const defaultHash = await hashPassword('totalplay2026');
+        const valid = inputHash === (storedHash || defaultHash);
+        return new Response(JSON.stringify({ valid, token: valid ? inputHash : null }), {
+          status: 200,
+          headers: CORS
+        });
+      }
+
+      case 'packages':
+        await kv.put('packages', JSON.stringify(data));
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
+
+      case 'contact':
+        await kv.put('contact', JSON.stringify(data));
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
+
+      case 'testimonials':
+        await kv.put('testimonials', JSON.stringify(data));
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
+
+      case 'change_password': {
+        const newHash = await hashPassword(newPassword);
+        await kv.put('admin_password', newHash);
+        return new Response(JSON.stringify({ success: true, token: newHash }), { status: 200, headers: CORS });
+      }
+
+      case 'reset_defaults':
+        await kv.put('packages', JSON.stringify(DEFAULT_PACKAGES));
+        await kv.put('contact', JSON.stringify(DEFAULT_CONTACT));
+        await kv.put('testimonials', JSON.stringify(DEFAULT_TESTIMONIALS));
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
+
+      case 'import_all':
+        if (data.packages) await kv.put('packages', JSON.stringify(data.packages));
+        if (data.contact) await kv.put('contact', JSON.stringify(data.contact));
+        if (data.testimonials) await kv.put('testimonials', JSON.stringify(data.testimonials));
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
+
+      default:
+        return new Response(JSON.stringify({ error: 'Tipo no válido' }), {
+          status: 400,
+          headers: CORS
+        });
+    }
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: CORS
+    });
+  }
 }
 
-function getContact() {
-  return _cache.contact || JSON.parse(JSON.stringify(DEFAULT_CONTACT));
+// ---------- OPTIONS: CORS preflight ----------
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: CORS });
 }
 
-function getTestimonials() {
-  return _cache.testimonials || JSON.parse(JSON.stringify(DEFAULT_TESTIMONIALS));
-}
-
-function getSiteData() {
-  return {
-    packages: getPackages(),
-    contact: getContact(),
-    testimonials: getTestimonials()
-  };
-}
-
-/* ========== ASYNC SAVE FUNCTIONS (write to API) ========== */
-
-async function apiPost(type, data, extra = {}) {
-  const body = { type, data, ...extra };
-  const resp = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Admin-Token': getAdminToken()
-    },
-    body: JSON.stringify(body)
-  });
-  const result = await resp.json();
-  if (!resp.ok) throw new Error(result.error || 'Error al guardar');
-  return result;
-}
-
-async function savePackages(packages) {
-  _cache.packages = packages;
-  await apiPost('packages', packages);
-}
-
-async function saveContact(contact) {
-  _cache.contact = contact;
-  await apiPost('contact', contact);
-}
-
-async function saveTestimonials(testimonials) {
-  _cache.testimonials = testimonials;
-  await apiPost('testimonials', testimonials);
-}
-
-/* ========== PASSWORD UTILS ========== */
-
+// ---------- SHA-256 hash ----------
 async function hashPassword(pwd) {
   const data = new TextEncoder().encode(pwd);
   const buf = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function verifyPassword(input) {
-  try {
-    const resp = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'verify_password', password: input })
-    });
-    const result = await resp.json();
-    if (result.valid && result.token) {
-      setAdminToken(result.token);
-    }
-    return result.valid;
-  } catch (e) {
-    // Fallback: local hash check
-    const inputHash = await hashPassword(input);
-    const defaultHash = await hashPassword('totalplay2026');
-    const valid = inputHash === defaultHash;
-    if (valid) setAdminToken(inputHash);
-    return valid;
-  }
-}
-
-async function changePassword(newPwd) {
-  const result = await apiPost('change_password', null, { newPassword: newPwd });
-  if (result.token) setAdminToken(result.token);
-}
-
-/* ========== EXPORT / IMPORT ========== */
-
-function exportAllData() {
-  const data = {
-    packages: getPackages(),
-    contact: getContact(),
-    testimonials: getTestimonials(),
-    exportDate: new Date().toISOString(),
-    version: '1.0'
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `totalplay-data-${new Date().toISOString().slice(0, 10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-async function importAllData(jsonString) {
-  try {
-    const data = JSON.parse(jsonString);
-    await apiPost('import_all', data);
-    // Update cache
-    if (data.packages) _cache.packages = data.packages;
-    if (data.contact) _cache.contact = data.contact;
-    if (data.testimonials) _cache.testimonials = data.testimonials;
-    return { success: true };
-  } catch (e) {
-    return { success: false, error: e.message };
-  }
-}
-
-async function resetToDefaults() {
-  await apiPost('reset_defaults', null);
-  _cache.packages = JSON.parse(JSON.stringify(DEFAULT_PACKAGES));
-  _cache.contact = JSON.parse(JSON.stringify(DEFAULT_CONTACT));
-  _cache.testimonials = JSON.parse(JSON.stringify(DEFAULT_TESTIMONIALS));
-}
-
-/* ========== UTILITY: Generate unique ID ========== */
-function generateId(prefix = 'item') {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-/* ========== UTILITY: Resize image to max dimension ========== */
-function resizeImage(file, maxDim = 400) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        if (width > height) {
-          if (width > maxDim) { height = (height * maxDim) / width; width = maxDim; }
-        } else {
-          if (height > maxDim) { width = (width * maxDim) / height; height = maxDim; }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/webp', 0.8));
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/* ========== WhatsApp URL builder ========== */
-function buildWhatsAppURL(contact, message) {
-  const phone = contact.whatsapp.replace(/\D/g, '');
-  const text = encodeURIComponent(message);
-  return `https://wa.me/${phone}?text=${text}`;
 }
