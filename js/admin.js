@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLogin();
   initTabs();
   initDataManagement();
+  initMobileSidebar();
 });
 
 /* ==================== LOGIN ==================== */
@@ -36,7 +37,8 @@ function initLogin() {
         adminToast('¡Bienvenido al panel de administración!', 'success');
       } else {
         loginError.classList.add('show');
-        loginError.textContent = '❌ Contraseña incorrecta. Inténtalo de nuevo.';
+        const errTxt = document.getElementById('login-error-text');
+        if (errTxt) errTxt.textContent = 'Contraseña incorrecta. Inténtalo de nuevo.';
       }
     });
   }
@@ -61,15 +63,48 @@ async function initAdminData() {
 }
 
 /* ==================== TABS ==================== */
+const TAB_TITLES = {
+  'tab-packages':    'Paquetes',
+  'tab-contact':     'Contacto',
+  'tab-testimonials':'Testimonios',
+  'tab-settings':    'Configuración'
+};
+
 function initTabs() {
-  document.querySelectorAll('.admin-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+    item.addEventListener('click', () => {
+      const tabId = item.dataset.tab;
+      // Update nav active state
+      document.querySelectorAll('.nav-item[data-tab]').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      // Update panels
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.tab).classList.add('active');
+      const panel = document.getElementById(tabId);
+      if (panel) panel.classList.add('active');
+      // Update topbar title
+      const topbarTitle = document.getElementById('topbar-title');
+      if (topbarTitle) topbarTitle.textContent = TAB_TITLES[tabId] || '';
+      // Close mobile sidebar
+      closeMobileSidebar();
     });
   });
+}
+
+/* ==================== MOBILE SIDEBAR ==================== */
+function initMobileSidebar() {
+  const toggle = document.getElementById('menu-toggle');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (toggle) toggle.addEventListener('click', () => {
+    document.getElementById('admin-sidebar').classList.add('open');
+    overlay.classList.add('show');
+  });
+  if (overlay) overlay.addEventListener('click', closeMobileSidebar);
+}
+function closeMobileSidebar() {
+  const sidebar = document.getElementById('admin-sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
 }
 
 /* ==================== LOAD ALL ==================== */
@@ -78,6 +113,20 @@ function loadAllSections() {
   loadContactForm();
   loadTestimonialsList();
   loadPasswordSection();
+  updateStats();
+}
+
+/* ==================== STATS ==================== */
+function updateStats() {
+  const packages = getPackages();
+  const active = packages.filter(p => p.active);
+  const minPrice = active.length ? Math.min(...active.map(p => p.price)) : 0;
+  const elTotal = document.getElementById('stat-total');
+  const elActive = document.getElementById('stat-active');
+  const elMin = document.getElementById('stat-min-price');
+  if (elTotal) elTotal.textContent = packages.length;
+  if (elActive) elActive.textContent = active.length;
+  if (elMin) elMin.textContent = minPrice ? `$${minPrice}` : '—';
 }
 
 /* ==================== PACKAGES ==================== */
@@ -85,26 +134,44 @@ function renderPackageList() {
   const list = document.getElementById('pkg-list');
   if (!list) return;
   const packages = getPackages().sort((a, b) => a.order - b.order);
+  updateStats();
 
   if (packages.length === 0) {
-    list.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:40px;">No hay paquetes. ¡Agrega uno!</p>';
+    list.innerHTML = `
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <p>No hay paquetes. ¡Agrega uno con el botón de arriba!</p>
+      </div>`;
     return;
   }
 
+  const typeLabel = { internet: 'Internet', dobleplay: 'Doble Play', tripleplay: 'Triple Play' };
+
   list.innerHTML = packages.map(pkg => `
     <div class="pkg-list-item" data-id="${pkg.id}">
-      <div class="drag-handle" title="Arrastrar">⠿</div>
+      <div class="drag-handle" title="Arrastrar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
+      </div>
       <div class="pkg-info">
         <h3>${pkg.name}</h3>
-        <p>${pkg.speed} Mbps${pkg.channels ? ' · ' + pkg.channels + '+ canales' : ''}</p>
+        <p>${pkg.speed} Mbps${pkg.channels ? ' · ' + pkg.channels + ' canales' : ''}</p>
       </div>
       <div class="pkg-list-price">$${pkg.price}/mes</div>
-      <span class="pkg-badge ${pkg.popular ? 'popular' : ''}" style="${pkg.popular ? '' : 'display:none'}">${pkg.popular ? '⭐ Popular' : ''}</span>
-      <span class="pkg-badge ${pkg.active ? 'active' : 'inactive'}">${pkg.active ? 'Activo' : 'Inactivo'}</span>
+      <div class="pkg-badges">
+        ${pkg.popular ? '<span class="pkg-badge popular">⭐ Popular</span>' : ''}
+        <span class="pkg-badge type">${typeLabel[pkg.type] || pkg.type}</span>
+        <span class="pkg-badge ${pkg.active ? 'active' : 'inactive'}">${pkg.active ? '● Activo' : '● Inactivo'}</span>
+      </div>
       <div class="pkg-actions">
-        <button class="btn-icon" onclick="editPackage('${pkg.id}')" title="Editar">✏️</button>
-        <button class="btn-icon" onclick="togglePackage('${pkg.id}')" title="Activar/Desactivar">👁️</button>
-        <button class="btn-icon" onclick="deletePackage('${pkg.id}')" title="Eliminar">🗑️</button>
+        <button class="btn-icon blue" onclick="editPackage('${pkg.id}')" title="Editar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon" onclick="togglePackage('${pkg.id}')" title="Activar/Desactivar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="btn-icon danger" onclick="deletePackage('${pkg.id}')" title="Eliminar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
       </div>
     </div>
   `).join('');
@@ -302,21 +369,40 @@ function loadTestimonialsList() {
   if (!list) return;
   const testimonials = getTestimonials();
 
+  if (testimonials.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <p>No hay testimonios. ¡Agrega el primero!</p>
+      </div>`;
+    return;
+  }
+
   list.innerHTML = testimonials.map(t => `
     <div class="pkg-list-item" data-id="${t.id}">
-      <div class="drag-handle">⠿</div>
+      <div class="drag-handle">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
+      </div>
       <div class="pkg-info">
         <h3>${t.name}</h3>
-        <p>${t.location} · ${'★'.repeat(t.rating)}</p>
+        <p>${t.location || 'Sin ubicación'} · ${'★'.repeat(t.rating)}</p>
       </div>
-      <div style="flex:1;font-size:0.85rem;color:var(--gray-300);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+      <div style="flex:1;font-size:0.82rem;color:var(--gray-500);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
         "${t.text}"
       </div>
-      <span class="pkg-badge ${t.active ? 'active' : 'inactive'}">${t.active ? 'Activo' : 'Inactivo'}</span>
+      <div class="pkg-badges">
+        <span class="pkg-badge ${t.active ? 'active' : 'inactive'}">${t.active ? '● Activo' : '● Inactivo'}</span>
+      </div>
       <div class="pkg-actions">
-        <button class="btn-icon" onclick="editTestimonial('${t.id}')" title="Editar">✏️</button>
-        <button class="btn-icon" onclick="toggleTestimonial('${t.id}')" title="Activar/Desactivar">👁️</button>
-        <button class="btn-icon" onclick="deleteTestimonial('${t.id}')" title="Eliminar">🗑️</button>
+        <button class="btn-icon blue" onclick="editTestimonial('${t.id}')" title="Editar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon" onclick="toggleTestimonial('${t.id}')" title="Activar/Desactivar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="btn-icon danger" onclick="deleteTestimonial('${t.id}')" title="Eliminar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
       </div>
     </div>
   `).join('');
@@ -483,6 +569,12 @@ async function handleResetDefaults() {
 }
 
 /* ==================== TOAST ==================== */
+const TOAST_ICONS = {
+  success: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`,
+  error:   `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+  info:    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+};
+
 function adminToast(message, type = 'info') {
   let container = document.querySelector('.admin-toast-container');
   if (!container) {
@@ -490,15 +582,17 @@ function adminToast(message, type = 'info') {
     container.className = 'admin-toast-container';
     document.body.appendChild(container);
   }
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
   const toast = document.createElement('div');
   toast.className = `admin-toast ${type}`;
-  toast.innerHTML = `${icons[type] || ''} ${message}`;
+  toast.innerHTML = `
+    <div class="toast-icon">${TOAST_ICONS[type] || TOAST_ICONS.info}</div>
+    <div class="toast-msg">${message}</div>
+  `;
   container.appendChild(toast);
   setTimeout(() => {
+    toast.style.transition = '0.35s ease';
     toast.style.opacity = '0';
-    toast.style.transform = 'translateX(100%)';
-    toast.style.transition = '0.3s ease';
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+    toast.style.transform = 'translateX(120%)';
+    setTimeout(() => toast.remove(), 350);
+  }, 3800);
 }
