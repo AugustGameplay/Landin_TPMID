@@ -351,6 +351,18 @@ select.admin-input {
   background-position: right 12px center;
   padding-right: 36px;
 }
+select.admin-input option {
+  background-color: #1c1c28;
+  color: #ffffff;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+}
+select.admin-input option:hover,
+select.admin-input option:focus,
+select.admin-input option:checked {
+  background-color: #2a2a3a;
+  color: #b7d027;
+}
 .admin-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .admin-form-row.three { grid-template-columns: 1fr 1fr 1fr; }
 
