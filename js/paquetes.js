@@ -170,8 +170,23 @@ async function apiPost(type, data, extra = {}) {
     },
     body: JSON.stringify(body)
   });
-  const result = await resp.json();
-  if (!resp.ok) throw new Error(result.error || 'Error al guardar');
+
+  // Read as text first to avoid crash when body is empty or non-JSON
+  let result = {};
+  const text = await resp.text();
+  if (text) {
+    try {
+      result = JSON.parse(text);
+    } catch (_) {
+      // Body exists but is not valid JSON (e.g. HTML error page)
+      if (!resp.ok) throw new Error(`Error del servidor (HTTP ${resp.status})`);
+    }
+  } else if (!resp.ok) {
+    // Empty body with a failed status
+    throw new Error(`Error del servidor (HTTP ${resp.status}) — respuesta vacía`);
+  }
+
+  if (!resp.ok) throw new Error(result.error || `Error al guardar (HTTP ${resp.status})`);
   return result;
 }
 
