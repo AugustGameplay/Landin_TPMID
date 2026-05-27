@@ -198,6 +198,7 @@ function openPackageModal(pkg = null) {
 
   // Prices
   document.getElementById('pkg-price').value           = pkg ? pkg.price : '';
+  document.getElementById('pkg-prompt-hint').value     = pkg ? (pkg.promptHint || '') : '';
   document.getElementById('pkg-list-price').value      = pkg ? (pkg.listPrice || '') : '';
   document.getElementById('pkg-loyalty-price').value   = pkg ? (pkg.loyaltyPrice || '') : '';
   document.getElementById('pkg-loyalty-discount').value= pkg ? (pkg.loyaltyDiscount || '') : '';
@@ -233,6 +234,7 @@ async function savePackage() {
   }
 
   const listPrice       = parseInt(document.getElementById('pkg-list-price').value) || null;
+  const promptHint      = document.getElementById('pkg-prompt-hint').value.trim() || null;
   const loyaltyPrice    = parseInt(document.getElementById('pkg-loyalty-price').value) || null;
   const loyaltyDiscount = parseInt(document.getElementById('pkg-loyalty-discount').value) || null;
   const badge           = document.getElementById('pkg-badge').value.trim();
@@ -246,6 +248,7 @@ async function savePackage() {
     speed:          speed,
     channels:       parseInt(document.getElementById('pkg-channels').value) || null,
     price:          price,
+    promptHint:     promptHint,
     listPrice:      listPrice,
     loyaltyPrice:   loyaltyPrice,
     loyaltyDiscount:loyaltyDiscount,

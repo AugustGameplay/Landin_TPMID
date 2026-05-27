@@ -108,7 +108,7 @@ function renderPackages() {
                 <span class="amount">${pkg.price}</span>
                 <span class="period">/mes</span>
               </div>
-              <div class="price-hint">Pagando los primeros 10 días tras tu corte</div>
+              <div class="price-hint">${pkg.promptHint || 'Pagando 5 días antes de tu corte'}</div>
             </div>
 
             <div class="pkg-secondary-price-box">

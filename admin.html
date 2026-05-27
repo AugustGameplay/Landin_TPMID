@@ -477,12 +477,19 @@
             <div class="admin-form-group">
               <label for="pkg-price">
                 Precio Pronto Pago *
-                <span class="field-hint">Pagando 5 días antes del corte</span>
+                <span class="field-hint">Ej: Pagando 5 días antes</span>
               </label>
               <div class="price-input-wrap">
                 <span class="price-prefix">$</span>
                 <input type="number" id="pkg-price" class="admin-input price-input" placeholder="599" required>
               </div>
+            </div>
+            <div class="admin-form-group">
+              <label for="pkg-prompt-hint">
+                Texto de Pronto Pago
+                <span class="field-hint">Texto debajo del precio principal</span>
+              </label>
+              <input type="text" id="pkg-prompt-hint" class="admin-input" placeholder="Pagando 5 días antes de tu corte">
             </div>
             <div class="admin-form-group">
               <label for="pkg-list-price">
