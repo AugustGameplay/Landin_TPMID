@@ -422,7 +422,7 @@
 
   <!-- ========== PACKAGE MODAL ========== -->
   <div class="modal-overlay" id="pkg-modal">
-    <div class="modal">
+    <div class="modal modal-wide">
       <div class="modal-header">
         <div class="modal-header-left">
           <div class="modal-title-icon" style="background:var(--tp-green-dim);color:var(--tp-green);">
@@ -436,6 +436,8 @@
       </div>
       <div class="modal-body">
         <form id="pkg-form" onsubmit="event.preventDefault(); savePackage();">
+
+          <!-- IDENTIFICACIÓN -->
           <div class="admin-form-group">
             <label for="pkg-name">Nombre del paquete *</label>
             <input type="text" id="pkg-name" class="admin-input" placeholder="Ej: 300 Megas Simétricos" required>
@@ -450,25 +452,129 @@
               </select>
             </div>
             <div class="admin-form-group">
-              <label for="pkg-speed">Velocidad (Mbps) *</label>
-              <input type="number" id="pkg-speed" class="admin-input" placeholder="300" required>
+              <label for="pkg-category">Categoría (tab)</label>
+              <select id="pkg-category" class="admin-input">
+                <option value="internet">Internet</option>
+                <option value="tv">TV + Internet</option>
+              </select>
             </div>
             <div class="admin-form-group">
-              <label for="pkg-price">Precio mensual *</label>
-              <input type="number" id="pkg-price" class="admin-input" placeholder="699" required>
+              <label for="pkg-speed">Velocidad (Mbps) *</label>
+              <input type="number" id="pkg-speed" class="admin-input" placeholder="300" required>
             </div>
           </div>
           <div class="admin-form-group">
             <label for="pkg-channels">Canales de TV (dejar vacío si solo internet)</label>
             <input type="number" id="pkg-channels" class="admin-input" placeholder="190">
           </div>
-          <div class="admin-form-group">
-            <label for="pkg-features">Características (una por línea)</label>
-            <textarea id="pkg-features" class="admin-input" rows="4" placeholder="Fibra óptica simétrica&#10;WiFi Mesh incluido&#10;Instalación GRATIS"></textarea>
+
+          <!-- ── PRECIOS ── -->
+          <div class="modal-section-divider">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Precios
+          </div>
+          <div class="admin-form-row three">
+            <div class="admin-form-group">
+              <label for="pkg-price">
+                Precio Pronto Pago *
+                <span class="field-hint">Pagando 5 días antes del corte</span>
+              </label>
+              <div class="price-input-wrap">
+                <span class="price-prefix">$</span>
+                <input type="number" id="pkg-price" class="admin-input price-input" placeholder="599" required>
+              </div>
+            </div>
+            <div class="admin-form-group">
+              <label for="pkg-list-price">
+                Precio de Lista
+                <span class="field-hint">Precio sin descuento</span>
+              </label>
+              <div class="price-input-wrap">
+                <span class="price-prefix">$</span>
+                <input type="number" id="pkg-list-price" class="admin-input price-input" placeholder="649">
+              </div>
+            </div>
+            <div class="admin-form-group">
+              <label for="pkg-loyalty-price">
+                Precio de Lealtad
+                <span class="field-hint">A partir del 6° mes</span>
+              </label>
+              <div class="price-input-wrap">
+                <span class="price-prefix">$</span>
+                <input type="number" id="pkg-loyalty-price" class="admin-input price-input" placeholder="569">
+              </div>
+            </div>
+          </div>
+          <div class="admin-form-group" style="max-width:220px;">
+            <label for="pkg-loyalty-discount">
+              Descuento de Lealtad ($/mes)
+              <span class="field-hint">Ahorro visible para el cliente</span>
+            </label>
+            <div class="price-input-wrap">
+              <span class="price-prefix discount-prefix">-$</span>
+              <input type="number" id="pkg-loyalty-discount" class="admin-input price-input" placeholder="30">
+            </div>
+          </div>
+
+          <!-- ── CONTENIDO ── -->
+          <div class="modal-section-divider">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Contenido del paquete
           </div>
           <div class="admin-form-group">
-            <label for="pkg-streaming">Streaming incluido (separado por comas)</label>
-            <input type="text" id="pkg-streaming" class="admin-input" placeholder="HBO Max, Prime Video, Netflix">
+            <label for="pkg-features">Características (una por línea)</label>
+            <textarea id="pkg-features" class="admin-input" rows="4" placeholder="✅ Totalplay TV&#10;📞 Línea Telefónica y App Totalplay&#10;🌐 Fibra óptica 100% simétrica"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label for="pkg-streaming">Plataformas de streaming (separadas por comas)</label>
+            <input type="text" id="pkg-streaming" class="admin-input" placeholder="HBO Max básico con anuncios (5 meses), Netflix básico con anuncios (5 meses)">
+          </div>
+
+          <!-- ── EXTRAS ── -->
+          <div class="modal-section-divider">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Etiqueta y visibilidad
+          </div>
+          <div class="admin-form-group">
+            <label for="pkg-badge">
+              Etiqueta especial (badge)
+              <span class="field-hint">Ej: 🔊 ¡Surround incluido! &nbsp;·&nbsp; ⚽ ¡Paquete futbolero!</span>
+            </label>
+            <div class="emoji-input-wrap" id="emoji-wrap-badge">
+              <input type="text" id="pkg-badge" class="admin-input emoji-input" placeholder="🔊 ¡Surround incluido!" autocomplete="off">
+              <button type="button" class="emoji-trigger-btn" onclick="toggleEmojiPicker('badge')" title="Insertar emoji">
+                😊
+              </button>
+              <div class="emoji-picker-popup" id="emoji-picker-badge">
+                <div class="emoji-picker-label">Frecuentes</div>
+                <div class="emoji-grid">
+                  <button type="button" onclick="insertEmoji('badge','🔊')">🔊</button>
+                  <button type="button" onclick="insertEmoji('badge','⚽')">⚽</button>
+                  <button type="button" onclick="insertEmoji('badge','🏆')">🏆</button>
+                  <button type="button" onclick="insertEmoji('badge','⭐')">⭐</button>
+                  <button type="button" onclick="insertEmoji('badge','🔥')">🔥</button>
+                  <button type="button" onclick="insertEmoji('badge','✅')">✅</button>
+                  <button type="button" onclick="insertEmoji('badge','🎁')">🎁</button>
+                  <button type="button" onclick="insertEmoji('badge','💎')">💎</button>
+                  <button type="button" onclick="insertEmoji('badge','🚀')">🚀</button>
+                  <button type="button" onclick="insertEmoji('badge','📺')">📺</button>
+                  <button type="button" onclick="insertEmoji('badge','🎬')">🎬</button>
+                  <button type="button" onclick="insertEmoji('badge','🎮')">🎮</button>
+                  <button type="button" onclick="insertEmoji('badge','📶')">📶</button>
+                  <button type="button" onclick="insertEmoji('badge','💡')">💡</button>
+                  <button type="button" onclick="insertEmoji('badge','🎵')">🎵</button>
+                  <button type="button" onclick="insertEmoji('badge','🌐')">🌐</button>
+                  <button type="button" onclick="insertEmoji('badge','📞')">📞</button>
+                  <button type="button" onclick="insertEmoji('badge','💰')">💰</button>
+                  <button type="button" onclick="insertEmoji('badge','🏠')">🏠</button>
+                  <button type="button" onclick="insertEmoji('badge','🎊')">🎊</button>
+                  <button type="button" onclick="insertEmoji('badge','🏅')">🏅</button>
+                  <button type="button" onclick="insertEmoji('badge','⚡')">⚡</button>
+                  <button type="button" onclick="insertEmoji('badge','🎯')">🎯</button>
+                  <button type="button" onclick="insertEmoji('badge','🆕')">🆕</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="admin-form-row">
             <div class="admin-form-group">
@@ -484,6 +590,7 @@
               </label>
             </div>
           </div>
+
         </form>
       </div>
       <div class="modal-footer">

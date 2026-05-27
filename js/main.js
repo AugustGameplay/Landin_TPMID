@@ -86,9 +86,9 @@ function renderPackages() {
       return `
         <div class="pkg-card ${pkg.popular ? 'popular' : ''}">
           ${pkg.popular ? '<div class="pkg-popular-badge">⭐ Más Popular</div>' : ''}
-          ${pkg.badge ? `<div class="pkg-custom-badge">${pkg.badge}</div>` : ''}
 
           <div class="pkg-category-label">${catLabel}</div>
+          ${pkg.badge ? `<div class="pkg-custom-badge">${pkg.badge}</div>` : ''}
 
           <div class="pkg-speed-hero">
             <span class="speed-number">${pkg.speed}</span>
@@ -211,8 +211,13 @@ function renderAdvisor() {
 /* ---------- RENDER CONTACT INFO ---------- */
 function renderContactInfo() {
   const el = document.getElementById('contact-info');
-  if (!el) return;
   const contact = getContact();
+
+  // Update topbar phone dynamically
+  const topbarPhone = document.getElementById('topbar-phone');
+  if (topbarPhone && contact.phone) topbarPhone.textContent = contact.phone;
+
+  if (!el) return;
   const waURL = buildWhatsAppURL(contact, '¡Hola! Quisiera contratar un paquete de Totalplay.');
 
   el.innerHTML = `
@@ -395,7 +400,7 @@ function initCounters() {
 }
 
 function animateCounter(el) {
-  const target = parseInt(el.dataset.count);
+  const target = parseInt(el.dataset.count.replace(/,/g, ''));
   const suffix = el.dataset.suffix || '';
   const duration = 1500;
   const start = performance.now();
@@ -405,7 +410,7 @@ function animateCounter(el) {
     const progress = Math.min(elapsed / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
     const value = Math.round(eased * target);
-    el.textContent = value.toLocaleString() + suffix;
+    el.textContent = value.toLocaleString('en-US') + suffix;
     if (progress < 1) requestAnimationFrame(update);
   }
   requestAnimationFrame(update);

@@ -153,10 +153,13 @@ function renderPackageList() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
       </div>
       <div class="pkg-info">
-        <h3>${pkg.name}</h3>
-        <p>${pkg.speed} Mbps${pkg.channels ? ' · ' + pkg.channels + ' canales' : ''}</p>
+        <h3>${pkg.name}${pkg.badge ? ' <span class="pkg-badge-inline">' + pkg.badge + '</span>' : ''}</h3>
+        <p>${pkg.speed} Mbps${pkg.channels ? ' · ' + pkg.channels + ' canales' : ''}${pkg.loyaltyPrice ? ' · Lealtad $' + pkg.loyaltyPrice + '/mes' : ''}</p>
       </div>
-      <div class="pkg-list-price">$${pkg.price}/mes</div>
+      <div class="pkg-list-price">
+        $${pkg.price}/mes
+        ${pkg.listPrice ? '<span class="pkg-list-price-old">$' + pkg.listPrice + '</span>' : ''}
+      </div>
       <div class="pkg-badges">
         ${pkg.popular ? '<span class="pkg-badge popular">⭐ Popular</span>' : ''}
         <span class="pkg-badge type">${typeLabel[pkg.type] || pkg.type}</span>
@@ -186,15 +189,27 @@ function openPackageModal(pkg = null) {
   title.textContent = pkg ? 'Editar Paquete' : 'Nuevo Paquete';
   form.dataset.editId = pkg ? pkg.id : '';
 
-  document.getElementById('pkg-name').value = pkg ? pkg.name : '';
-  document.getElementById('pkg-type').value = pkg ? pkg.type : 'internet';
-  document.getElementById('pkg-speed').value = pkg ? pkg.speed : '';
-  document.getElementById('pkg-channels').value = pkg ? (pkg.channels || '') : '';
-  document.getElementById('pkg-price').value = pkg ? pkg.price : '';
-  document.getElementById('pkg-features').value = pkg ? pkg.features.join('\n') : '';
+  // Identification
+  document.getElementById('pkg-name').value        = pkg ? pkg.name : '';
+  document.getElementById('pkg-type').value        = pkg ? pkg.type : 'internet';
+  document.getElementById('pkg-category').value    = pkg ? (pkg.category || 'internet') : 'internet';
+  document.getElementById('pkg-speed').value       = pkg ? pkg.speed : '';
+  document.getElementById('pkg-channels').value    = pkg ? (pkg.channels || '') : '';
+
+  // Prices
+  document.getElementById('pkg-price').value           = pkg ? pkg.price : '';
+  document.getElementById('pkg-list-price').value      = pkg ? (pkg.listPrice || '') : '';
+  document.getElementById('pkg-loyalty-price').value   = pkg ? (pkg.loyaltyPrice || '') : '';
+  document.getElementById('pkg-loyalty-discount').value= pkg ? (pkg.loyaltyDiscount || '') : '';
+
+  // Content
+  document.getElementById('pkg-features').value  = pkg ? (pkg.features || []).join('\n') : '';
   document.getElementById('pkg-streaming').value = pkg ? (pkg.streaming || []).join(', ') : '';
-  document.getElementById('pkg-popular').checked = pkg ? pkg.popular : false;
-  document.getElementById('pkg-active').checked = pkg ? pkg.active : true;
+
+  // Extras
+  document.getElementById('pkg-badge').value       = pkg ? (pkg.badge || '') : '';
+  document.getElementById('pkg-popular').checked   = pkg ? !!pkg.popular : false;
+  document.getElementById('pkg-active').checked    = pkg ? !!pkg.active : true;
 
   modal.classList.add('active');
 }
@@ -208,7 +223,7 @@ async function savePackage() {
   const editId = form.dataset.editId;
   const packages = getPackages();
 
-  const name = document.getElementById('pkg-name').value.trim();
+  const name  = document.getElementById('pkg-name').value.trim();
   const speed = parseInt(document.getElementById('pkg-speed').value);
   const price = parseInt(document.getElementById('pkg-price').value);
 
@@ -217,35 +232,39 @@ async function savePackage() {
     return;
   }
 
+  const listPrice       = parseInt(document.getElementById('pkg-list-price').value) || null;
+  const loyaltyPrice    = parseInt(document.getElementById('pkg-loyalty-price').value) || null;
+  const loyaltyDiscount = parseInt(document.getElementById('pkg-loyalty-discount').value) || null;
+  const badge           = document.getElementById('pkg-badge').value.trim();
+  const category        = document.getElementById('pkg-category').value;
+
   const pkgData = {
-    id: editId || generateId('pkg'),
-    name: name,
-    type: document.getElementById('pkg-type').value,
-    speed: speed,
-    channels: parseInt(document.getElementById('pkg-channels').value) || null,
-    price: price,
-    features: document.getElementById('pkg-features').value.split('\n').map(f => f.trim()).filter(Boolean),
-    streaming: document.getElementById('pkg-streaming').value.split(',').map(s => s.trim()).filter(Boolean),
-    popular: document.getElementById('pkg-popular').checked,
-    active: document.getElementById('pkg-active').checked,
-    order: 0
+    id:             editId || generateId('pkg'),
+    name:           name,
+    type:           document.getElementById('pkg-type').value,
+    category:       category,
+    speed:          speed,
+    channels:       parseInt(document.getElementById('pkg-channels').value) || null,
+    price:          price,
+    listPrice:      listPrice,
+    loyaltyPrice:   loyaltyPrice,
+    loyaltyDiscount:loyaltyDiscount,
+    features:       document.getElementById('pkg-features').value.split('\n').map(f => f.trim()).filter(Boolean),
+    streaming:      document.getElementById('pkg-streaming').value.split(',').map(s => s.trim()).filter(Boolean),
+    badge:          badge,
+    popular:        document.getElementById('pkg-popular').checked,
+    active:         document.getElementById('pkg-active').checked,
+    order:          0
   };
 
   if (editId) {
     const idx = packages.findIndex(p => p.id === editId);
     if (idx !== -1) {
-      const oldPkg = packages[idx];
-      pkgData.order = oldPkg.order;
-      pkgData.category = oldPkg.category;
-      pkgData.listPrice = oldPkg.listPrice;
-      pkgData.loyaltyPrice = oldPkg.loyaltyPrice;
-      pkgData.loyaltyDiscount = oldPkg.loyaltyDiscount;
-      pkgData.badge = oldPkg.badge;
+      pkgData.order = packages[idx].order; // preserve order
       packages[idx] = pkgData;
     }
   } else {
     pkgData.order = packages.length;
-    pkgData.category = pkgData.channels ? 'tv' : 'internet';
     packages.push(pkgData);
   }
 
@@ -596,3 +615,43 @@ function adminToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 350);
   }, 3800);
 }
+
+/* ==================== EMOJI PICKER ==================== */
+function toggleEmojiPicker(key) {
+  const popup  = document.getElementById(`emoji-picker-${key}`);
+  const btn    = document.querySelector(`#emoji-wrap-${key} .emoji-trigger-btn`);
+  const isOpen = popup.classList.contains('open');
+
+  // Close all open pickers first
+  document.querySelectorAll('.emoji-picker-popup.open').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.emoji-trigger-btn.active').forEach(b => b.classList.remove('active'));
+
+  if (!isOpen) {
+    popup.classList.add('open');
+    btn && btn.classList.add('active');
+  }
+}
+
+function insertEmoji(key, emoji) {
+  const input = document.getElementById(`pkg-${key}`);
+  if (!input) return;
+  const start = input.selectionStart;
+  const end   = input.selectionEnd;
+  const val   = input.value;
+  input.value = val.slice(0, start) + emoji + val.slice(end);
+  // Move cursor after inserted emoji
+  const newPos = start + emoji.length;
+  input.setSelectionRange(newPos, newPos);
+  input.focus();
+  // Close picker
+  document.querySelectorAll('.emoji-picker-popup.open').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.emoji-trigger-btn.active').forEach(b => b.classList.remove('active'));
+}
+
+// Close emoji picker when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.emoji-input-wrap')) {
+    document.querySelectorAll('.emoji-picker-popup.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.emoji-trigger-btn.active').forEach(b => b.classList.remove('active'));
+  }
+});

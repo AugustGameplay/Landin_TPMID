@@ -474,6 +474,22 @@ select.admin-input option:checked {
 .pkg-badge.inactive { background: var(--red-dim);     color: var(--red);   border: 1px solid rgba(255,90,90,0.2); }
 .pkg-badge.type     { background: var(--tp-blue-dim); color: var(--tp-blue); border: 1px solid rgba(79,171,214,0.2); }
 
+/* Inline badge inside package name */
+.pkg-badge-inline {
+  font-size: 0.65rem; font-weight: 700;
+  color: var(--tp-yellow); background: rgba(244,176,0,0.1);
+  border: 1px solid rgba(244,176,0,0.25);
+  border-radius: 99px; padding: 1px 7px;
+  vertical-align: middle; margin-left: 6px;
+}
+
+/* Old (list) price strikethrough in list view */
+.pkg-list-price-old {
+  display: block; font-size: 0.7rem; font-weight: 500;
+  color: var(--gray-500); text-decoration: line-through;
+  letter-spacing: 0;
+}
+
 .pkg-actions { display: flex; gap: 6px; }
 
 /* Empty state */
@@ -527,6 +543,7 @@ select.admin-input option:checked {
   transform: scale(0.96) translateY(12px);
   transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
+.modal.modal-wide { max-width: 720px; }
 .modal-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 20px 24px;
@@ -552,6 +569,103 @@ select.admin-input option:checked {
   display: flex; justify-content: flex-end; gap: 10px;
   padding: 16px 24px;
   border-top: 1px solid var(--dark-border);
+}
+
+/* Modal internal section dividers */
+.modal-section-divider {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--gray-500);
+  margin: 22px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--dark-border);
+}
+.modal-section-divider svg { flex-shrink: 0; }
+
+/* Price input with $ prefix */
+.price-input-wrap {
+  position: relative; display: flex; align-items: center;
+}
+.price-prefix {
+  position: absolute; left: 12px;
+  font-size: 0.85rem; font-weight: 700; color: var(--tp-green);
+  pointer-events: none; z-index: 1;
+}
+.discount-prefix { color: var(--red); }
+.price-input { padding-left: 28px !important; }
+
+/* Field hint (small subtitle under label) */
+.field-hint {
+  display: block; font-size: 0.7rem; font-weight: 400;
+  color: var(--gray-500); margin-top: 1px; letter-spacing: 0;
+}
+
+/* ===================== EMOJI PICKER ===================== */
+.emoji-input-wrap {
+  position: relative; display: flex; align-items: stretch; gap: 0;
+}
+.emoji-input-wrap .emoji-input {
+  flex: 1; border-radius: var(--radius-sm) 0 0 var(--radius-sm) !important;
+  border-right: none !important;
+}
+.emoji-input-wrap .emoji-input:focus {
+  z-index: 1;
+}
+.emoji-trigger-btn {
+  width: 44px; flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--dark-border);
+  border-left: none;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 1.1rem; line-height: 1;
+  cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+.emoji-trigger-btn:hover {
+  background: var(--tp-green-dim);
+  border-color: var(--tp-green);
+}
+.emoji-trigger-btn.active {
+  background: var(--tp-green-dim);
+  border-color: rgba(183,208,39,0.4);
+  box-shadow: 0 0 0 3px rgba(183,208,39,0.1);
+}
+
+.emoji-picker-popup {
+  position: absolute; bottom: calc(100% + 8px); right: 0;
+  background: var(--dark-card2);
+  border: 1px solid var(--dark-border2);
+  border-radius: var(--radius);
+  padding: 12px 14px 14px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+  z-index: 9999; width: 260px;
+  display: none;
+  animation: emojiIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  transform-origin: bottom right;
+}
+.emoji-picker-popup.open { display: block; }
+@keyframes emojiIn {
+  from { opacity: 0; transform: scale(0.85) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.emoji-picker-label {
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--gray-500);
+  margin-bottom: 8px;
+}
+.emoji-grid {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px;
+}
+.emoji-grid button {
+  background: none; border: none;
+  font-size: 1.25rem; line-height: 1;
+  padding: 6px 2px; border-radius: 6px;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center;
+}
+.emoji-grid button:hover {
+  background: rgba(255,255,255,0.08);
+  transform: scale(1.25);
 }
 
 /* ===================== SECTION DIVIDER ===================== */
@@ -658,6 +772,7 @@ select.admin-input option:checked {
   from { transform: translateX(120%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
+
 
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
