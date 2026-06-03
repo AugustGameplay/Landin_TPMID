@@ -7,7 +7,7 @@
 const API_URL = '/api/data';
 
 // In-memory cache so we don't refetch on every call within same page load
-let _cache = { packages: null, contact: null, testimonials: null, loaded: false };
+let _cache = { packages: null, contact: null, testimonials: null, content: null, loaded: false };
 
 // Admin auth token (stored in sessionStorage after login)
 function getAdminToken() {
@@ -114,6 +114,29 @@ const DEFAULT_TESTIMONIALS = [
   { id: 'test-4', name: 'Ana P.', location: 'Fracc. Altabrisa, Mérida', text: 'Lo mejor es que incluye HBO Max y varias plataformas. Ya no pago servicios extra de streaming. ¡Todo en un solo paquete!', rating: 4, active: true }
 ];
 
+const DEFAULT_CONTENT = {
+  seo: {
+    title: 'Contratar Totalplay Mérida | Internet Fibra Óptica desde $460/mes — Distribuidor Autorizado',
+    description: 'Contrata Totalplay en Mérida, Yucatán. Internet de fibra óptica simétrica desde $460/mes hasta 10,000 Megas. Instalación en menos de 24 hrs. Netflix, HBO Max y Apple TV+ incluidos. Tel. 990 194 5673',
+    keywords: 'Totalplay Mérida, contratar Totalplay, internet fibra óptica Mérida, paquetes Totalplay 2026, internet Yucatán, TV Totalplay, streaming, distribuidor autorizado Totalplay Mérida, WiFi Mérida, internet rápido Mérida, triple play Mérida'
+  },
+  hero: {
+    title: 'Contrata <span class="text-gradient">Totalplay</span> en Mérida — Internet Fibra Óptica desde $460/mes',
+    subtitle: 'Fibra óptica simétrica real de hasta 10,000 Megas. Netflix, HBO Max y Apple TV+ incluidos. Instalación en menos de 24 hrs. El internet más rápido de México para tu hogar y negocio.',
+    stat1Value: '10000', stat1Suffix: ' Megas', stat1Label: 'Velocidad máxima', stat1Prefix: '',
+    stat2Value: '250', stat2Suffix: '+', stat2Label: 'Canales HD/4K', stat2Prefix: '',
+    stat3Value: '24', stat3Suffix: ' hrs', stat3Label: 'Instalación express', stat3Prefix: '< '
+  },
+  faq: [
+    { id: 'faq-1', q: '¿Totalplay tiene cobertura en mi zona de Mérida?', a: 'Totalplay tiene amplia cobertura en Mérida y su zona metropolitana. La red de fibra óptica se extiende por las principales colonias y fraccionamientos. Contáctanos con tu código postal y verificamos disponibilidad en menos de 5 minutos.', active: true },
+    { id: 'faq-2', q: '¿Cuánto tarda la instalación?', a: 'La instalación típica se realiza en menos de 24 horas hábiles después de confirmar tu contratación. Un técnico certificado acudirá a tu domicilio en el horario que más te convenga.', active: true },
+    { id: 'faq-3', q: '¿Qué necesito para contratar?', a: 'Solo necesitas una identificación oficial (INE) y un comprobante de domicilio reciente. No se requiere tarjeta de crédito obligatoria — puedes pagar en OXXO, transferencia o domiciliación.', active: true },
+    { id: 'faq-4', q: '¿La velocidad es realmente simétrica?', a: 'Sí. Totalplay ofrece velocidad simétrica real, lo que significa que tu velocidad de subida es igual a la de bajada. Perfecto para videollamadas, streaming en 4K y subir contenido.', active: true },
+    { id: 'faq-5', q: '¿Puedo cancelar en cualquier momento?', a: 'Dependiendo del plan, muchos de nuestros paquetes no tienen permanencia forzosa. Consulta las condiciones específicas de tu paquete con tu asesor. Queremos que te quedes porque estás contento, no por contrato.', active: true },
+    { id: 'faq-6', q: '¿Qué plataformas de streaming incluye?', a: 'Dependiendo del paquete hay plataformas incluidas sin costo por promoción o a Precio especial, tambien puedes agregarlas en bundle o elegirlas a la carta', active: true }
+  ]
+};
+
 /* ========== FETCH DATA FROM API ========== */
 
 async function loadSiteData() {
@@ -125,12 +148,14 @@ async function loadSiteData() {
     _cache.packages = data.packages || DEFAULT_PACKAGES;
     _cache.contact = data.contact || DEFAULT_CONTACT;
     _cache.testimonials = data.testimonials || DEFAULT_TESTIMONIALS;
+    _cache.content = data.content || DEFAULT_CONTENT;
     _cache.loaded = true;
   } catch (e) {
     console.warn('API unavailable, using defaults:', e.message);
     _cache.packages = JSON.parse(JSON.stringify(DEFAULT_PACKAGES));
     _cache.contact = JSON.parse(JSON.stringify(DEFAULT_CONTACT));
     _cache.testimonials = JSON.parse(JSON.stringify(DEFAULT_TESTIMONIALS));
+    _cache.content = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
     _cache.loaded = true;
   }
   return _cache;
@@ -150,11 +175,16 @@ function getTestimonials() {
   return _cache.testimonials || JSON.parse(JSON.stringify(DEFAULT_TESTIMONIALS));
 }
 
+function getContent() {
+  return _cache.content || JSON.parse(JSON.stringify(DEFAULT_CONTENT));
+}
+
 function getSiteData() {
   return {
     packages: getPackages(),
     contact: getContact(),
-    testimonials: getTestimonials()
+    testimonials: getTestimonials(),
+    content: getContent()
   };
 }
 
@@ -205,6 +235,11 @@ async function saveTestimonials(testimonials) {
   await apiPost('testimonials', testimonials);
 }
 
+async function saveContent(content) {
+  _cache.content = content;
+  await apiPost('content', content);
+}
+
 /* ========== PASSWORD UTILS ========== */
 
 async function hashPassword(pwd) {
@@ -247,6 +282,7 @@ function exportAllData() {
     packages: getPackages(),
     contact: getContact(),
     testimonials: getTestimonials(),
+    content: getContent(),
     exportDate: new Date().toISOString(),
     version: '1.0'
   };
@@ -267,6 +303,7 @@ async function importAllData(jsonString) {
     if (data.packages) _cache.packages = data.packages;
     if (data.contact) _cache.contact = data.contact;
     if (data.testimonials) _cache.testimonials = data.testimonials;
+    if (data.content) _cache.content = data.content;
     return { success: true };
   } catch (e) {
     return { success: false, error: e.message };
@@ -278,6 +315,7 @@ async function resetToDefaults() {
   _cache.packages = JSON.parse(JSON.stringify(DEFAULT_PACKAGES));
   _cache.contact = JSON.parse(JSON.stringify(DEFAULT_CONTACT));
   _cache.testimonials = JSON.parse(JSON.stringify(DEFAULT_TESTIMONIALS));
+  _cache.content = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
 }
 
 /* ========== UTILITY: Generate unique ID ========== */

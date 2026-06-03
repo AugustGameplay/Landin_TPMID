@@ -87,6 +87,12 @@
           Testimonios
         </button>
 
+        <button class="nav-item" data-tab="tab-content" id="nav-content">
+          <div class="nav-item-indicator"></div>
+          <svg class="nav-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M6 11v8"/></svg>
+          Contenido Web
+        </button>
+
         <div class="sidebar-label" style="margin-top:8px;">Sistema</div>
 
         <button class="nav-item" data-tab="tab-settings" id="nav-settings">
@@ -331,6 +337,116 @@
               </button>
             </div>
             <div class="pkg-list" id="testimonials-list">
+              <!-- Rendered by admin.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: CONTENT WEB ===== -->
+        <div class="tab-panel" id="tab-content">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-header-left">
+                <div class="card-icon" style="background:var(--tp-blue-dim);color:var(--tp-blue);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M6 11v8"/></svg>
+                </div>
+                <div>
+                  <div class="card-title">Seo & Textos (Hero)</div>
+                  <div class="card-subtitle">Administra los textos principales y el SEO del sitio web</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEO -->
+            <div class="section-divider">
+              <div class="section-divider-line"></div>
+              <div class="section-divider-label">Optimización SEO</div>
+              <div class="section-divider-line"></div>
+            </div>
+            <div class="admin-form-group">
+              <label for="cw-seo-title">Título SEO (Pestaña del navegador)</label>
+              <input type="text" id="cw-seo-title" class="admin-input" placeholder="Contratar Totalplay Mérida | Internet Fibra...">
+            </div>
+            <div class="admin-form-group">
+              <label for="cw-seo-desc">Descripción (Meta Description)</label>
+              <textarea id="cw-seo-desc" class="admin-input" rows="2" placeholder="Contrata Totalplay en Mérida..."></textarea>
+            </div>
+            <div class="admin-form-group">
+              <label for="cw-seo-keywords">Palabras clave (Keywords)</label>
+              <input type="text" id="cw-seo-keywords" class="admin-input" placeholder="Totalplay Mérida, contratar, internet...">
+            </div>
+
+            <!-- HERO -->
+            <div class="section-divider">
+              <div class="section-divider-line"></div>
+              <div class="section-divider-label">Sección Principal (Hero)</div>
+              <div class="section-divider-line"></div>
+            </div>
+            <div class="admin-form-group">
+              <label for="cw-hero-title">Título Principal (H1)</label>
+              <input type="text" id="cw-hero-title" class="admin-input" placeholder="Contrata Totalplay en Mérida...">
+              <p style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;">Usa &lt;span class="text-gradient"&gt;Texto&lt;/span&gt; para aplicar color degradado.</p>
+            </div>
+            <div class="admin-form-group">
+              <label for="cw-hero-subtitle">Subtítulo</label>
+              <textarea id="cw-hero-subtitle" class="admin-input" rows="2" placeholder="Fibra óptica simétrica real..."></textarea>
+            </div>
+
+            <div class="admin-form-row three">
+              <div class="admin-form-group">
+                <label>Estadística 1</label>
+                <input type="text" id="cw-stat1-lbl" class="admin-input" placeholder="Etiqueta (ej: Velocidad máxima)">
+                <div style="display:flex; gap:4px; margin-top:4px;">
+                  <input type="text" id="cw-stat1-prefix" class="admin-input" placeholder="Prefijo" style="width:30%">
+                  <input type="text" id="cw-stat1-val" class="admin-input" placeholder="Valor (10000)">
+                  <input type="text" id="cw-stat1-suffix" class="admin-input" placeholder="Sufijo" style="width:30%">
+                </div>
+              </div>
+              <div class="admin-form-group">
+                <label>Estadística 2</label>
+                <input type="text" id="cw-stat2-lbl" class="admin-input" placeholder="Etiqueta (ej: Canales HD/4K)">
+                <div style="display:flex; gap:4px; margin-top:4px;">
+                  <input type="text" id="cw-stat2-prefix" class="admin-input" placeholder="Prefijo" style="width:30%">
+                  <input type="text" id="cw-stat2-val" class="admin-input" placeholder="Valor (250)">
+                  <input type="text" id="cw-stat2-suffix" class="admin-input" placeholder="Sufijo" style="width:30%">
+                </div>
+              </div>
+              <div class="admin-form-group">
+                <label>Estadística 3</label>
+                <input type="text" id="cw-stat3-lbl" class="admin-input" placeholder="Etiqueta (ej: Instalación)">
+                <div style="display:flex; gap:4px; margin-top:4px;">
+                  <input type="text" id="cw-stat3-prefix" class="admin-input" placeholder="Prefijo" style="width:30%">
+                  <input type="text" id="cw-stat3-val" class="admin-input" placeholder="Valor (24)">
+                  <input type="text" id="cw-stat3-suffix" class="admin-input" placeholder="Sufijo" style="width:30%">
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:24px;display:flex;gap:10px;">
+              <button class="btn btn-primary" onclick="saveSeoHeroContent()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-card" style="margin-top: 24px;">
+            <div class="admin-card-header">
+              <div class="admin-card-header-left">
+                <div class="card-icon" style="background:var(--tp-blue-dim);color:var(--tp-blue);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div>
+                  <div class="card-title">Preguntas Frecuentes (FAQ)</div>
+                  <div class="card-subtitle">Administra las preguntas en la sección de FAQ</div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="openFaqModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nueva Pregunta
+              </button>
+            </div>
+            <div class="pkg-list" id="faq-list-admin">
               <!-- Rendered by admin.js -->
             </div>
           </div>
@@ -655,6 +771,42 @@
         <button class="btn btn-primary btn-sm" onclick="saveTestimonial()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
           Guardar Testimonio
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FAQ MODAL ========== -->
+  <div class="modal-overlay" id="faq-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-title-icon" style="background:var(--tp-blue-dim);color:var(--tp-blue);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h2 id="faq-modal-title">Nueva Pregunta Frecuente</h2>
+        </div>
+        <button class="modal-close" onclick="closeFaqModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="faq-form" onsubmit="event.preventDefault(); saveFaq();">
+          <div class="admin-form-group">
+            <label for="faq-q">Pregunta *</label>
+            <input type="text" id="faq-q" class="admin-input" placeholder="Ej: ¿Cuánto tarda la instalación?" required>
+          </div>
+          <div class="admin-form-group">
+            <label for="faq-a">Respuesta *</label>
+            <textarea id="faq-a" class="admin-input" rows="4" placeholder="Ej: La instalación típica se realiza en..." required></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closeFaqModal()">Cancelar</button>
+        <button class="btn btn-primary btn-sm" onclick="saveFaq()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Guardar Pregunta
         </button>
       </div>
     </div>

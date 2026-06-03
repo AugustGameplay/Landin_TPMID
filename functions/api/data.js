@@ -98,6 +98,29 @@ const DEFAULT_TESTIMONIALS = [
   { id: 'test-4', name: 'Ana P.', location: 'Fracc. Altabrisa, Mérida', text: 'Lo mejor es que incluye HBO Max y varias plataformas. Ya no pago servicios extra de streaming. ¡Todo en un solo paquete!', rating: 4, active: true }
 ];
 
+const DEFAULT_CONTENT = {
+  seo: {
+    title: 'Contratar Totalplay Mérida | Internet Fibra Óptica desde $460/mes — Distribuidor Autorizado',
+    description: 'Contrata Totalplay en Mérida, Yucatán. Internet de fibra óptica simétrica desde $460/mes hasta 10,000 Megas. Instalación en menos de 24 hrs. Netflix, HBO Max y Apple TV+ incluidos. Tel. 990 194 5673',
+    keywords: 'Totalplay Mérida, contratar Totalplay, internet fibra óptica Mérida, paquetes Totalplay 2026, internet Yucatán, TV Totalplay, streaming, distribuidor autorizado Totalplay Mérida, WiFi Mérida, internet rápido Mérida, triple play Mérida'
+  },
+  hero: {
+    title: 'Contrata <span class="text-gradient">Totalplay</span> en Mérida — Internet Fibra Óptica desde $460/mes',
+    subtitle: 'Fibra óptica simétrica real de hasta 10,000 Megas. Netflix, HBO Max y Apple TV+ incluidos. Instalación en menos de 24 hrs. El internet más rápido de México para tu hogar y negocio.',
+    stat1Value: '10000', stat1Suffix: ' Megas', stat1Label: 'Velocidad máxima', stat1Prefix: '',
+    stat2Value: '250', stat2Suffix: '+', stat2Label: 'Canales HD/4K', stat2Prefix: '',
+    stat3Value: '24', stat3Suffix: ' hrs', stat3Label: 'Instalación express', stat3Prefix: '< '
+  },
+  faq: [
+    { id: 'faq-1', q: '¿Totalplay tiene cobertura en mi zona de Mérida?', a: 'Totalplay tiene amplia cobertura en Mérida y su zona metropolitana. La red de fibra óptica se extiende por las principales colonias y fraccionamientos. Contáctanos con tu código postal y verificamos disponibilidad en menos de 5 minutos.', active: true },
+    { id: 'faq-2', q: '¿Cuánto tarda la instalación?', a: 'La instalación típica se realiza en menos de 24 horas hábiles después de confirmar tu contratación. Un técnico certificado acudirá a tu domicilio en el horario que más te convenga.', active: true },
+    { id: 'faq-3', q: '¿Qué necesito para contratar?', a: 'Solo necesitas una identificación oficial (INE) y un comprobante de domicilio reciente. No se requiere tarjeta de crédito obligatoria — puedes pagar en OXXO, transferencia o domiciliación.', active: true },
+    { id: 'faq-4', q: '¿La velocidad es realmente simétrica?', a: 'Sí. Totalplay ofrece velocidad simétrica real, lo que significa que tu velocidad de subida es igual a la de bajada. Perfecto para videollamadas, streaming en 4K y subir contenido.', active: true },
+    { id: 'faq-5', q: '¿Puedo cancelar en cualquier momento?', a: 'Dependiendo del plan, muchos de nuestros paquetes no tienen permanencia forzosa. Consulta las condiciones específicas de tu paquete con tu asesor. Queremos que te quedes porque estás contento, no por contrato.', active: true },
+    { id: 'faq-6', q: '¿Qué plataformas de streaming incluye?', a: 'Dependiendo del paquete hay plataformas incluidas sin costo por promoción o a Precio especial, tambien puedes agregarlas en bundle o elegirlas a la carta', active: true }
+  ]
+};
+
 const DEFAULT_PASSWORD_HASH = null; // computed on first use
 
 // CORS headers
@@ -123,13 +146,14 @@ export async function onRequestGet(context) {
   const kv = env.TP_DATA;
 
   try {
-    const [packages, contact, testimonials] = await Promise.all([
+    const [packages, contact, testimonials, content] = await Promise.all([
       kvGet(kv, 'packages', DEFAULT_PACKAGES),
       kvGet(kv, 'contact', DEFAULT_CONTACT),
-      kvGet(kv, 'testimonials', DEFAULT_TESTIMONIALS)
+      kvGet(kv, 'testimonials', DEFAULT_TESTIMONIALS),
+      kvGet(kv, 'content', DEFAULT_CONTENT)
     ]);
 
-    return new Response(JSON.stringify({ packages, contact, testimonials }), {
+    return new Response(JSON.stringify({ packages, contact, testimonials, content }), {
       status: 200,
       headers: CORS
     });
@@ -195,6 +219,10 @@ export async function onRequestPost(context) {
         await kv.put('testimonials', JSON.stringify(data));
         return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
 
+      case 'content':
+        await kv.put('content', JSON.stringify(data));
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
+
       case 'change_password': {
         const newHash = await hashPassword(newPassword);
         await kv.put('admin_password', newHash);
@@ -205,12 +233,14 @@ export async function onRequestPost(context) {
         await kv.put('packages', JSON.stringify(DEFAULT_PACKAGES));
         await kv.put('contact', JSON.stringify(DEFAULT_CONTACT));
         await kv.put('testimonials', JSON.stringify(DEFAULT_TESTIMONIALS));
+        await kv.put('content', JSON.stringify(DEFAULT_CONTENT));
         return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
 
       case 'import_all':
         if (data.packages) await kv.put('packages', JSON.stringify(data.packages));
         if (data.contact) await kv.put('contact', JSON.stringify(data.contact));
         if (data.testimonials) await kv.put('testimonials', JSON.stringify(data.testimonials));
+        if (data.content) await kv.put('content', JSON.stringify(data.content));
         return new Response(JSON.stringify({ success: true }), { status: 200, headers: CORS });
 
       default:

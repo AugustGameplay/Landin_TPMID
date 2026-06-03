@@ -15,12 +15,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderTestimonials();
   renderAdvisor();
   renderContactInfo();
+  renderContent();
   initFAQ();
   initForms();
   initScrollReveal();
   initPromoBanner();
   initMobileNav();
-  initCounters();
+  // initCounters(); // Counters now init inside renderContent() after DOM is populated
   renderWhatsAppFloat();
   // 2026 UX enhancements
   initScrollProgress();
@@ -273,6 +274,65 @@ function renderContactInfo() {
   if (window.lucide) lucide.createIcons();
 }
 
+/* ---------- RENDER CONTENT (SEO, HERO, FAQ) ---------- */
+function renderContent() {
+  const c = getContent();
+  if (!c) return;
+
+  // SEO
+  if (c.seo) {
+    if (c.seo.title) document.title = c.seo.title;
+    const descMeta = document.querySelector('meta[name="description"]');
+    if (descMeta && c.seo.description) descMeta.content = c.seo.description;
+    const keyMeta = document.querySelector('meta[name="keywords"]');
+    if (keyMeta && c.seo.keywords) keyMeta.content = c.seo.keywords;
+  }
+
+  // Hero
+  if (c.hero) {
+    const titleEl = document.getElementById('hero-title');
+    if (titleEl && c.hero.title) titleEl.innerHTML = c.hero.title;
+    
+    const subEl = document.getElementById('hero-subtitle');
+    if (subEl && c.hero.subtitle) subEl.textContent = c.hero.subtitle;
+
+    // Stats
+    const mapStat = (i) => {
+      const valEl = document.getElementById(`hero-stat-${i}-val`);
+      const lblEl = document.getElementById(`hero-stat-${i}-lbl`);
+      if (valEl) {
+        valEl.dataset.count = c.hero[`stat${i}Value`] || 0;
+        valEl.dataset.suffix = c.hero[`stat${i}Suffix`] || '';
+        valEl.dataset.prefix = c.hero[`stat${i}Prefix`] || '';
+      }
+      if (lblEl && c.hero[`stat${i}Label`]) {
+        lblEl.textContent = c.hero[`stat${i}Label`];
+      }
+    };
+    mapStat(1); mapStat(2); mapStat(3);
+    initCounters(); // Re-init after DOM populated
+  }
+
+  // FAQ
+  const faqList = document.getElementById('faq-list-container');
+  if (faqList && c.faq) {
+    const activeFaqs = c.faq.filter(f => f.active !== false);
+    if (activeFaqs.length > 0) {
+      faqList.innerHTML = activeFaqs.map(f => `
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            ${f.q}
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">${f.a}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
 /* ---------- FAQ ---------- */
 function initFAQ() {
   document.querySelectorAll('.faq-question').forEach(btn => {
@@ -415,6 +475,7 @@ function initCounters() {
 function animateCounter(el) {
   const target = parseInt(el.dataset.count.replace(/,/g, ''));
   const suffix = el.dataset.suffix || '';
+  const prefix = el.dataset.prefix || '';
   const duration = 1500;
   const start = performance.now();
 
@@ -423,7 +484,7 @@ function animateCounter(el) {
     const progress = Math.min(elapsed / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
     const value = Math.round(eased * target);
-    el.textContent = value.toLocaleString('en-US') + suffix;
+    el.textContent = prefix + value.toLocaleString('en-US') + suffix;
     if (progress < 1) requestAnimationFrame(update);
   }
   requestAnimationFrame(update);

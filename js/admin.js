@@ -67,6 +67,7 @@ const TAB_TITLES = {
   'tab-packages':    'Paquetes',
   'tab-contact':     'Contacto',
   'tab-testimonials':'Testimonios',
+  'tab-content':     'Contenido Web',
   'tab-settings':    'Configuración'
 };
 
@@ -112,6 +113,8 @@ function loadAllSections() {
   renderPackageList();
   loadContactForm();
   loadTestimonialsList();
+  loadContentForm();
+  loadFaqList();
   loadPasswordSection();
   updateStats();
 }
@@ -518,6 +521,206 @@ async function deleteTestimonial(id) {
     await saveTestimonials(testimonials);
     loadTestimonialsList();
     adminToast('Testimonio eliminado', 'success');
+  } catch (e) {
+    adminToast('Error: ' + e.message, 'error');
+  }
+}
+
+/* ==================== CONTENT WEB & SEO ==================== */
+function loadContentForm() {
+  const content = getContent();
+  
+  if (content.seo) {
+    document.getElementById('cw-seo-title').value = content.seo.title || '';
+    document.getElementById('cw-seo-desc').value = content.seo.description || '';
+    document.getElementById('cw-seo-keywords').value = content.seo.keywords || '';
+  }
+
+  if (content.hero) {
+    document.getElementById('cw-hero-title').value = content.hero.title || '';
+    document.getElementById('cw-hero-subtitle').value = content.hero.subtitle || '';
+    
+    document.getElementById('cw-stat1-lbl').value = content.hero.stat1Label || '';
+    document.getElementById('cw-stat1-val').value = content.hero.stat1Value || '';
+    document.getElementById('cw-stat1-suffix').value = content.hero.stat1Suffix || '';
+    document.getElementById('cw-stat1-prefix').value = content.hero.stat1Prefix || '';
+    
+    document.getElementById('cw-stat2-lbl').value = content.hero.stat2Label || '';
+    document.getElementById('cw-stat2-val').value = content.hero.stat2Value || '';
+    document.getElementById('cw-stat2-suffix').value = content.hero.stat2Suffix || '';
+    document.getElementById('cw-stat2-prefix').value = content.hero.stat2Prefix || '';
+    
+    document.getElementById('cw-stat3-lbl').value = content.hero.stat3Label || '';
+    document.getElementById('cw-stat3-val').value = content.hero.stat3Value || '';
+    document.getElementById('cw-stat3-suffix').value = content.hero.stat3Suffix || '';
+    document.getElementById('cw-stat3-prefix').value = content.hero.stat3Prefix || '';
+  }
+}
+
+async function saveSeoHeroContent() {
+  const content = getContent();
+  
+  content.seo = {
+    title: document.getElementById('cw-seo-title').value.trim(),
+    description: document.getElementById('cw-seo-desc').value.trim(),
+    keywords: document.getElementById('cw-seo-keywords').value.trim()
+  };
+
+  content.hero = {
+    title: document.getElementById('cw-hero-title').value.trim(),
+    subtitle: document.getElementById('cw-hero-subtitle').value.trim(),
+    stat1Label: document.getElementById('cw-stat1-lbl').value.trim(),
+    stat1Value: document.getElementById('cw-stat1-val').value.trim(),
+    stat1Suffix: document.getElementById('cw-stat1-suffix').value,
+    stat1Prefix: document.getElementById('cw-stat1-prefix').value,
+    stat2Label: document.getElementById('cw-stat2-lbl').value.trim(),
+    stat2Value: document.getElementById('cw-stat2-val').value.trim(),
+    stat2Suffix: document.getElementById('cw-stat2-suffix').value,
+    stat2Prefix: document.getElementById('cw-stat2-prefix').value,
+    stat3Label: document.getElementById('cw-stat3-lbl').value.trim(),
+    stat3Value: document.getElementById('cw-stat3-val').value.trim(),
+    stat3Suffix: document.getElementById('cw-stat3-suffix').value,
+    stat3Prefix: document.getElementById('cw-stat3-prefix').value
+  };
+
+  try {
+    await saveContent(content);
+    adminToast('Contenido guardado exitosamente ✅', 'success');
+  } catch (e) {
+    adminToast('Error al guardar: ' + e.message, 'error');
+  }
+}
+
+/* ==================== FAQ ==================== */
+function loadFaqList() {
+  const list = document.getElementById('faq-list-admin');
+  if (!list) return;
+  const content = getContent();
+  const faq = content.faq || [];
+
+  if (faq.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <p>No hay preguntas frecuentes. ¡Agrega la primera!</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = faq.map(f => `
+    <div class="pkg-list-item" data-id="${f.id}">
+      <div class="drag-handle">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
+      </div>
+      <div class="pkg-info" style="flex:2">
+        <h3>${f.q}</h3>
+        <p style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:350px;">${f.a}</p>
+      </div>
+      <div class="pkg-badges">
+        <span class="pkg-badge ${f.active !== false ? 'active' : 'inactive'}">${f.active !== false ? '● Activa' : '● Inactiva'}</span>
+      </div>
+      <div class="pkg-actions">
+        <button class="btn-icon blue" onclick="editFaq('${f.id}')" title="Editar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon" onclick="toggleFaq('${f.id}')" title="Activar/Desactivar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="btn-icon danger" onclick="deleteFaq('${f.id}')" title="Eliminar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openFaqModal(f = null) {
+  const modal = document.getElementById('faq-modal');
+  const title = document.getElementById('faq-modal-title');
+  const form = document.getElementById('faq-form');
+
+  title.textContent = f ? 'Editar Pregunta' : 'Nueva Pregunta';
+  form.dataset.editId = f ? f.id : '';
+
+  document.getElementById('faq-q').value = f ? f.q : '';
+  document.getElementById('faq-a').value = f ? f.a : '';
+
+  modal.classList.add('active');
+}
+
+function closeFaqModal() {
+  document.getElementById('faq-modal').classList.remove('active');
+}
+
+async function saveFaq() {
+  const form = document.getElementById('faq-form');
+  const editId = form.dataset.editId;
+  const content = getContent();
+  if (!content.faq) content.faq = [];
+
+  const q = document.getElementById('faq-q').value.trim();
+  const a = document.getElementById('faq-a').value.trim();
+  
+  if (!q || !a) {
+    adminToast('La pregunta y respuesta son obligatorias', 'error');
+    return;
+  }
+
+  const fData = {
+    id: editId || generateId('faq'),
+    q: q,
+    a: a,
+    active: true
+  };
+
+  if (editId) {
+    const idx = content.faq.findIndex(f => f.id === editId);
+    if (idx !== -1) {
+      fData.active = content.faq[idx].active !== false;
+      content.faq[idx] = fData;
+    }
+  } else {
+    content.faq.push(fData);
+  }
+
+  try {
+    await saveContent(content);
+    loadFaqList();
+    closeFaqModal();
+    adminToast(editId ? 'FAQ actualizada ✅' : 'FAQ creada ✅', 'success');
+  } catch (e) {
+    adminToast('Error: ' + e.message, 'error');
+  }
+}
+
+function editFaq(id) {
+  const f = (getContent().faq || []).find(x => x.id === id);
+  if (f) openFaqModal(f);
+}
+
+async function toggleFaq(id) {
+  const content = getContent();
+  const f = (content.faq || []).find(x => x.id === id);
+  if (f) {
+    f.active = f.active === false ? true : false;
+    try {
+      await saveContent(content);
+      loadFaqList();
+      adminToast(f.active ? 'FAQ activada' : 'FAQ desactivada', 'info');
+    } catch (e) {
+      adminToast('Error: ' + e.message, 'error');
+    }
+  }
+}
+
+async function deleteFaq(id) {
+  if (!confirm('¿Eliminar esta pregunta frecuente?')) return;
+  const content = getContent();
+  content.faq = (content.faq || []).filter(x => x.id !== id);
+  try {
+    await saveContent(content);
+    loadFaqList();
+    adminToast('FAQ eliminada', 'success');
   } catch (e) {
     adminToast('Error: ' + e.message, 'error');
   }
