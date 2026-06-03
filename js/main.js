@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   initMobileNav();
   initCounters();
   renderWhatsAppFloat();
+  // 2026 UX enhancements
+  initScrollProgress();
+  initCustomCursor();
+  initCardTilt();
+  // Initialize Lucide icons (static elements)
+  if (window.lucide) lucide.createIcons();
 });
 
 /* ---------- CATEGORY TABS ---------- */
@@ -74,18 +80,18 @@ function renderPackages() {
 
       // Build streaming chips
       const streamingHTML = (pkg.streaming && pkg.streaming.length > 0) ? pkg.streaming.map(s => {
-        let icon = '🎬';
+      let iconHtml = '<i data-lucide="play" class="streaming-icon"></i>';
         let cls = '';
-        if (s.toLowerCase().includes('netflix')) { icon = '🔴'; cls = 'chip-netflix'; }
-        else if (s.toLowerCase().includes('hbo')) { icon = '🟣'; cls = 'chip-hbo'; }
-        else if (s.toLowerCase().includes('apple')) { icon = '⚫'; cls = 'chip-apple'; }
+        if (s.toLowerCase().includes('netflix')) { iconHtml = '<span class="chip-dot chip-dot-netflix"></span>'; cls = 'chip-netflix'; }
+        else if (s.toLowerCase().includes('hbo')) { iconHtml = '<span class="chip-dot chip-dot-hbo"></span>'; cls = 'chip-hbo'; }
+        else if (s.toLowerCase().includes('apple')) { iconHtml = '<span class="chip-dot chip-dot-apple"></span>'; cls = 'chip-apple'; }
         const isIncluded = s.toLowerCase().includes('incluido');
-        return `<div class="streaming-chip ${cls} ${isIncluded ? 'chip-included' : ''}">${icon} ${s}</div>`;
+        return `<div class="streaming-chip ${cls} ${isIncluded ? 'chip-included' : ''}">${iconHtml} ${s}</div>`;
       }).join('') : '';
 
       return `
         <div class="pkg-card ${pkg.popular ? 'popular' : ''}">
-          ${pkg.popular ? '<div class="pkg-popular-badge">⭐ Más Popular</div>' : ''}
+          ${pkg.popular ? '<div class="pkg-popular-badge"><svg class="icon-inline" viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Más Popular</div>' : ''}
 
           <div class="pkg-category-label">${catLabel}</div>
           ${pkg.badge ? `<div class="pkg-custom-badge">${pkg.badge}</div>` : ''}
@@ -98,11 +104,11 @@ function renderPackages() {
             </div>
           </div>
 
-          ${pkg.channels ? '<div class="pkg-channels-badge">📺 +190 canales (124 HD)</div>' : ''}
+          ${pkg.channels ? '<div class="pkg-channels-badge"><i data-lucide="tv-2"></i> +190 canales (124 HD)</div>' : ''}
 
           <div class="pkg-price-section">
             <div class="pkg-main-price-box">
-              <div class="price-label-badge">💰 Precio Pronto Pago</div>
+              <div class="price-label-badge"><i data-lucide="tag"></i> Precio Pronto Pago</div>
               <div class="pkg-price">
                 <span class="currency">$</span>
                 <span class="amount">${pkg.price}</span>
@@ -113,11 +119,11 @@ function renderPackages() {
 
             <div class="pkg-secondary-price-box">
               <div class="sec-price-row">
-                <span class="sec-label">📋 Precio de lista:</span>
+                <span class="sec-label"><i data-lucide="list"></i> Precio de lista:</span>
                 <span class="sec-val line-through">$${listPrice}/mes</span>
               </div>
               <div class="sec-price-row highlight">
-                <span class="sec-label">🎁 A partir del 6° mes:</span>
+                <span class="sec-label"><i data-lucide="gift"></i> A partir del 6° mes:</span>
                 <span class="sec-val font-bold">$${loyaltyPrice}/mes</span>
               </div>
               <div class="sec-discount-hint">Ahorro permanente de $${loyaltyDiscount} al mes por lealtad</div>
@@ -125,15 +131,18 @@ function renderPackages() {
           </div>
 
           <div class="pkg-includes-section">
-            <div class="pkg-includes-title">✅ Incluye:</div>
+            <div class="pkg-includes-title"><i data-lucide="check-circle"></i> Incluye:</div>
             <ul class="pkg-features">
-              ${pkg.features.map(f => `<li>${f}</li>`).join('')}
+              ${pkg.features.map(f => {
+                const clean = f.replace(/^[^\wà-ÿ\(]+/, '').trim();
+                return `<li><i data-lucide="check" class="feature-check"></i>${clean}</li>`;
+              }).join('')}
             </ul>
           </div>
 
           ${streamingHTML ? `
             <div class="pkg-streaming-section">
-              <div class="pkg-streaming-title">🎬 Plataformas de Streaming:</div>
+              <div class="pkg-streaming-title"><i data-lucide="play-circle"></i> Plataformas de Streaming:</div>
               <div class="pkg-streaming-chips">
                 ${streamingHTML}
               </div>
@@ -141,7 +150,7 @@ function renderPackages() {
           ` : ''}
 
           <a href="${waURL}" target="_blank" rel="noopener" class="btn btn-whatsapp pkg-cta-btn">
-            💬 ¡Lo quiero! Contratar por WhatsApp
+            <i data-lucide="message-circle"></i> ¡Lo quiero! Contratar por WhatsApp
           </a>
         </div>
       `;
@@ -150,6 +159,8 @@ function renderPackages() {
 
   // Reveal newly injected cards
   setTimeout(revealNewCards, 50);
+  // Re-initialize Lucide icons inside packages grid
+  if (window.lucide) lucide.createIcons({ nameAttr: 'data-lucide' });
 
   // Populate select in forms
   const selects = document.querySelectorAll('.pkg-select');
@@ -198,14 +209,15 @@ function renderAdvisor() {
         <div class="advisor-title">${contact.advisorTitle}</div>
         <p class="advisor-bio">${contact.advisorBio}</p>
         <div class="advisor-contact" style="flex-wrap:wrap;gap:8px;">
-          <a href="tel:${contact.phone}" class="btn btn-secondary btn-sm" title="Teléfono Principal">📞 ${contact.phone}</a>
-          ${contact.phoneSecondary ? `<a href="tel:${contact.phoneSecondary}" class="btn btn-secondary btn-sm" title="Teléfono Secundario">📞 ${contact.phoneSecondary}</a>` : ''}
-          <a href="${waURL}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm">💬 WhatsApp</a>
-          <a href="mailto:${contact.email}" class="btn btn-secondary btn-sm">✉️ Email</a>
+          <a href="tel:${contact.phone}" class="btn btn-secondary btn-sm" title="Teléfono Principal"><i data-lucide="phone"></i> ${contact.phone}</a>
+          ${contact.phoneSecondary ? `<a href="tel:${contact.phoneSecondary}" class="btn btn-secondary btn-sm" title="Teléfono Secundario"><i data-lucide="phone"></i> ${contact.phoneSecondary}</a>` : ''}
+          <a href="${waURL}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm"><i data-lucide="message-circle"></i> WhatsApp</a>
+          <a href="mailto:${contact.email}" class="btn btn-secondary btn-sm"><i data-lucide="mail"></i> Email</a>
         </div>
       </div>
     </div>
   `;
+  if (window.lucide) lucide.createIcons();
 }
 
 /* ---------- RENDER CONTACT INFO ---------- */
@@ -222,7 +234,7 @@ function renderContactInfo() {
 
   el.innerHTML = `
     <div class="contact-info-item">
-      <div class="contact-icon">📞</div>
+      <div class="contact-icon"><i data-lucide="phone"></i></div>
       <div>
         <h4>Teléfonos de atención</h4>
         <p><a href="tel:${contact.phone}">${contact.phone}</a> (Principal)</p>
@@ -230,34 +242,35 @@ function renderContactInfo() {
       </div>
     </div>
     <div class="contact-info-item">
-      <div class="contact-icon">💬</div>
+      <div class="contact-icon"><i data-lucide="message-circle"></i></div>
       <div>
         <h4>WhatsApp</h4>
         <p><a href="${waURL}" target="_blank" rel="noopener">Enviar mensaje directo</a></p>
       </div>
     </div>
     <div class="contact-info-item">
-      <div class="contact-icon">✉️</div>
+      <div class="contact-icon"><i data-lucide="mail"></i></div>
       <div>
         <h4>Correo electrónico</h4>
         <p><a href="mailto:${contact.email}">${contact.email}</a></p>
       </div>
     </div>
     <div class="contact-info-item">
-      <div class="contact-icon">📍</div>
+      <div class="contact-icon"><i data-lucide="map-pin"></i></div>
       <div>
         <h4>Ubicación</h4>
         <p>${contact.address}</p>
       </div>
     </div>
     <div class="contact-info-item">
-      <div class="contact-icon">🕐</div>
+      <div class="contact-icon"><i data-lucide="clock"></i></div>
       <div>
         <h4>Horario de atención</h4>
         <p>${contact.schedule}</p>
       </div>
     </div>
   `;
+  if (window.lucide) lucide.createIcons();
 }
 
 /* ---------- FAQ ---------- */
@@ -435,11 +448,105 @@ function showToast(message, type = 'success') {
   }
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  toast.innerHTML = `${type === 'success' ? '✅' : '❌'} ${message}`;
+  toast.innerHTML = `${type === 'success' ? '<i data-lucide="check-circle" class="icon-toast"></i>' : '<i data-lucide="x-circle" class="icon-toast"></i>'} ${message}`;
   container.appendChild(toast);
+  if (window.lucide) lucide.createIcons();
   setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateX(100%)';
     setTimeout(() => toast.remove(), 300);
   }, 4000);
+}
+
+/* ---------- SCROLL PROGRESS BAR ---------- */
+function initScrollProgress() {
+  const bar = document.getElementById('scroll-progress');
+  if (!bar) return;
+  const update = () => {
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    if (total <= 0) return;
+    bar.style.width = ((window.scrollY / total) * 100) + '%';
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+/* ---------- CUSTOM CURSOR ---------- */
+function initCustomCursor() {
+  // Only on pointer devices (desktop)
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  const dot = document.getElementById('cursor-dot');
+  const orb = document.getElementById('cursor-orb');
+  if (!dot || !orb) return;
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let orbX   = mouseX;
+  let orbY   = mouseY;
+  let rafId  = null;
+
+  // Instantly move the dot
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top  = mouseY + 'px';
+  });
+
+  // Lag the orb with lerp
+  function animateOrb() {
+    orbX += (mouseX - orbX) * 0.10;
+    orbY += (mouseY - orbY) * 0.10;
+    orb.style.left = orbX + 'px';
+    orb.style.top  = orbY + 'px';
+    rafId = requestAnimationFrame(animateOrb);
+  }
+  animateOrb();
+
+  // Expand orb on interactive elements
+  const hoverTargets = 'a, button, .pkg-card, .btn, .faq-question, .pkg-tab-btn, input, select, textarea';
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(hoverTargets)) orb.classList.add('expanded');
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(hoverTargets)) orb.classList.remove('expanded');
+  });
+
+  // Shrink on click
+  document.addEventListener('mousedown', () => orb.classList.add('clicking'));
+  document.addEventListener('mouseup',   () => orb.classList.remove('clicking'));
+
+  // Hide when leaving window
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity = '0';
+    orb.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    dot.style.opacity = '1';
+    orb.style.opacity = '1';
+  });
+}
+
+/* ---------- 3D TILT ON PACKAGE CARDS ---------- */
+function initCardTilt() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  // Event delegation so it works after tab switches / re-renders
+  document.addEventListener('mousemove', (e) => {
+    const card = e.target.closest('#packages-grid .pkg-card');
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width  - 0.5;  // -0.5 → 0.5
+    const y = (e.clientY - rect.top)  / rect.height - 0.5;
+    card.style.transform =
+      `perspective(900px) rotateX(${y * -6}deg) rotateY(${x * 6}deg) translateY(-6px) scale(1.01)`;
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    const card = e.target.closest('#packages-grid .pkg-card');
+    if (card && !card.contains(e.relatedTarget)) {
+      card.style.transform = '';
+    }
+  });
 }

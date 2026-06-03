@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contratar Totalplay Mérida | Internet Fibra Óptica desde $460/mes — Distribuidor Autorizado</title>
   <meta name="description"
-    content="Contrata Totalplay en Mérida, Yucatán. Internet de fibra óptica simétrica desde $460/mes. Instalación en menos de 24 hrs. Netflix, HBO Max y Apple TV+ incluidos. ☎️ 990 194 5673">
+    content="Contrata Totalplay en Mérida, Yucatán. Internet de fibra óptica simétrica desde $460/mes hasta 10,000 Megas. Instalación en menos de 24 hrs. Netflix, HBO Max y Apple TV+ incluidos. Tel. 990 194 5673">
   <meta name="keywords"
     content="Totalplay Mérida, contratar Totalplay, internet fibra óptica Mérida, paquetes Totalplay 2026, internet Yucatán, TV Totalplay, streaming, distribuidor autorizado Totalplay Mérida, WiFi Mérida, internet rápido Mérida, triple play Mérida">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -17,7 +17,7 @@
   <!-- Open Graph -->
   <meta property="og:title" content="Contratar Totalplay Mérida — Internet Fibra Óptica desde $460/mes">
   <meta property="og:description"
-    content="Internet de fibra óptica simétrica hasta 1000 Mbps. Netflix, HBO Max y Apple TV+ incluidos. Instalación en menos de 24 hrs. ¡Llama ahora! ☎️ 990 194 5673">
+    content="Internet de fibra óptica simétrica hasta 10,000 Megas. Netflix, HBO Max y Apple TV+ incluidos. Instalación en menos de 24 hrs. Distribuidor autorizado Totalplay Mérida.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_MX">
   <meta property="og:site_name" content="Totalplay Mérida — Distribuidor Autorizado">
@@ -26,11 +26,15 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Contratar Totalplay Mérida — Internet Fibra Óptica desde $460/mes">
   <meta name="twitter:description"
-    content="Fibra óptica simétrica real. Netflix, HBO Max incluidos. Instalación express. ☎️ 990 194 5673">
+    content="Fibra óptica simétrica real hasta 10,000 Megas. Netflix, HBO Max incluidos. Instalación express en Mérida, Yucatán.">
 
-  <!-- Performance -->
+  <!-- Performance / Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap">
 
   <!-- Favicon -->
   <link rel="icon" href="img/triangulototal.png" type="image/png">
@@ -112,10 +116,18 @@
 
 <body>
 
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress-bar" id="scroll-progress"></div>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-orb" id="cursor-orb"></div>
+
   <!-- ========== PROMO BANNER ========== -->
   <div class="promo-banner" id="promo-banner">
-    <span class="promo-text">🔥 ¡Instalación GRATIS + Router WiFi 6 de regalo este mes!</span>
-    <button class="promo-close" aria-label="Cerrar">✕</button>
+    <span class="promo-text"><i data-lucide="flame" class="icon-promo"></i> ¡Instalación GRATIS + Router WiFi 6 de
+      regalo este mes!</span>
+    <button class="promo-close" aria-label="Cerrar"><i data-lucide="x"></i></button>
   </div>
 
   <!-- ========== TOPBAR ========== -->
@@ -134,19 +146,20 @@
       </div>
 
       <div class="topbar-contact">
-        <span class="topbar-phone">📞 <span id="topbar-phone">990 194 5673</span></span>
+        <span class="topbar-phone"><i data-lucide="phone" class="icon-sm"></i> <span id="topbar-phone">990 194
+            5673</span></span>
         <div class="topbar-cta">
           <a href="#paquetes" class="btn btn-primary btn-sm">¡Contrata Ahora!</a>
         </div>
       </div>
 
-      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menú">☰</button>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menú"><i data-lucide="menu"></i></button>
     </div>
   </nav>
 
   <!-- Mobile Nav Overlay -->
   <div class="mobile-nav" id="mobile-nav">
-    <button class="mobile-nav-close" aria-label="Cerrar menú">✕</button>
+    <button class="mobile-nav-close" aria-label="Cerrar menú"><i data-lucide="x"></i></button>
     <a href="#beneficios">Beneficios</a>
     <a href="#paquetes">Paquetes</a>
     <a href="#testimonios">Opiniones</a>
@@ -161,6 +174,13 @@
     <video class="hero-video-bg" autoplay loop muted playsinline>
       <source src="video_fondo.mp4" type="video/mp4">
     </video>
+    <!-- Ambient colour orbs -->
+    <div class="hero-orbs" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
+    </div>
     <div class="hero-grid"></div>
     <div class="container">
       <div class="hero-content">
@@ -173,7 +193,7 @@
           <h1>Contrata <span class="text-gradient">Totalplay</span> en Mérida — Internet Fibra Óptica desde $460/mes
           </h1>
           <p class="hero-subtitle">Fibra óptica simétrica real de hasta 10,000 Megas. Netflix, HBO Max y Apple TV+
-            incluidos. Instalación en menos de 24 hrs. El internet más rápido de Yucatán para tu hogar y negocio.</p>
+            incluidos. Instalación en menos de 24 hrs. El internet más rápido de México para tu hogar y negocio.</p>
 
           <div class="hero-stats">
             <div class="hero-stat">
@@ -191,7 +211,7 @@
           </div>
 
           <div class="hero-actions">
-            <a href="#paquetes" class="btn btn-primary">Ver Paquetes ⚡</a>
+            <a href="#paquetes" class="btn btn-primary">Ver Paquetes <i data-lucide="zap"></i></a>
             <a href="#contacto" class="btn btn-secondary">Solicitar Información</a>
           </div>
         </div>
@@ -216,7 +236,7 @@
               </div>
             </div>
             <button type="submit" class="btn btn-whatsapp" style="width:100%;margin-top:8px;">
-              💬 Enviar por WhatsApp
+              <i data-lucide="message-circle"></i> Enviar por WhatsApp
             </button>
             <p style="font-size:0.75rem;color:var(--gray-500);text-align:center;margin-top:10px;">
               Sin compromiso · Respuesta inmediata
@@ -227,13 +247,42 @@
     </div>
   </section>
 
-  <!-- ========== STREAMING BANNER ========== -->
+  <!-- ========== PROMO IMAGE ========== -->
+  <div class="promo-img-section">
+    <div class="container">
+      <div class="promo-img-wrap reveal">
+        <img src="img/promo.jpeg" alt="Promoción Totalplay Mérida" class="promo-img">
+        <div class="promo-img-overlay">
+          <span class="promo-img-badge"><i data-lucide="flame"></i> Promoción Vigente</span>
+          <p class="promo-img-caption">Instalación gratuita + Router WiFi 6 de regalo este mes</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STREAMING MARQUEE ========== -->
   <div class="streaming-banner">
     <div class="container text-center">
-      <p class="streaming-text">Disfruta tus plataformas favoritas con nuestros paquetes</p>
-      <div class="streaming-logos">
-        <img src="img/logo-netflix.png" alt="Netflix" class="s-logo">
-        <img src="img/logo-hbo.png" alt="HBO Max" class="s-logo">
+      <span class="section-label" style="justify-content:center;margin-bottom:32px;">Plataformas de streaming
+        disponibles</span>
+    </div>
+    <div class="streaming-marquee-outer">
+      <div class="streaming-track">
+        <div class="marquee-item"><img src="img/logo-netflix.png" alt="Netflix" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-hbo.png" alt="HBO Max" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-disney.png" alt="Disney+" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-appletv.png" alt="Apple TV+" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-paramount.png" alt="Paramount+" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-vix.png" alt="VIX" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-universal.png" alt="Universal+" class="marquee-logo"></div>
+        <!-- Duplicate for seamless loop -->
+        <div class="marquee-item"><img src="img/logo-netflix.png" alt="Netflix" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-hbo.png" alt="HBO Max" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-disney.png" alt="Disney+" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-appletv.png" alt="Apple TV+" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-paramount.png" alt="Paramount+" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-vix.png" alt="VIX" class="marquee-logo"></div>
+        <div class="marquee-item"><img src="img/logo-universal.png" alt="Universal+" class="marquee-logo"></div>
       </div>
     </div>
   </div>
@@ -245,28 +294,28 @@
     <div class="container">
       <div class="text-center">
         <span class="section-label">¿Por qué Totalplay?</span>
-        <h2 class="section-title">La mejor conexión de <span class="text-gradient">Mérida</span></h2>
+        <h2 class="section-title">La mejor conexión de <span class="text-gradient">México</span></h2>
         <p class="section-subtitle mx-auto">Tecnología de punta con fibra óptica directa a tu hogar. Sin límites, sin
           letra chica.</p>
       </div>
       <div class="benefits-grid">
         <div class="benefit-card reveal">
-          <div class="benefit-icon">🔮</div>
+          <div class="benefit-icon"><i data-lucide="wifi"></i></div>
           <h3>Fibra Óptica 100%</h3>
           <p>Conexión directa de fibra hasta tu hogar. Sin cobre, sin intermitencias. Velocidad real garantizada.</p>
         </div>
         <div class="benefit-card reveal">
-          <div class="benefit-icon">📺</div>
+          <div class="benefit-icon"><i data-lucide="monitor-play"></i></div>
           <h3>Streaming Incluido</h3>
           <p>HBO Max, Prime Video, Paramount+ y más incluidos en tu paquete. Sin cargos extras.</p>
         </div>
         <div class="benefit-card reveal">
-          <div class="benefit-icon">🚀</div>
+          <div class="benefit-icon"><i data-lucide="clock-4"></i></div>
           <h3>Instalación en &lt; 24 hrs</h3>
           <p>Agenda tu instalación y en menos de 24 horas estarás conectado. Técnicos certificados.</p>
         </div>
         <div class="benefit-card reveal">
-          <div class="benefit-icon">🔓</div>
+          <div class="benefit-icon"><i data-lucide="lock-open"></i></div>
           <h3>Sin Permanencia Forzosa</h3>
           <p>Nos quedamos contigo porque nos eliges, no por contrato. Cancela cuando quieras sin penalización.</p>
         </div>
@@ -460,7 +509,7 @@
                 placeholder="¿Alguna pregunta o comentario?"></textarea>
             </div>
             <button type="submit" class="btn btn-whatsapp" style="width:100%">
-              💬 Enviar por WhatsApp
+              <i data-lucide="message-circle"></i> Enviar por WhatsApp
             </button>
           </form>
         </div>
@@ -470,16 +519,35 @@
 
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
+
+
+
+    <!-- Grid -->
     <div class="container">
       <div class="footer-grid">
+
+        <!-- Brand -->
         <div class="footer-brand">
-          <div class="topbar-logo" style="margin-bottom:16px;">
-            <img src="img/logo-totalplay.png" alt="Totalplay Mérida" class="footer-logo-img">
-          </div>
+          <img src="img/logo-totalplay.png" alt="Totalplay Mérida" class="footer-logo-img">
           <p>Distribuidor autorizado de Totalplay en Mérida, Yucatán. Internet de fibra óptica, televisión HD/4K y
             telefonía para tu hogar y negocio.</p>
+          <div class="footer-badge">
+            <i data-lucide="shield-check"></i> Distribuidor Oficial Certificado
+          </div>
         </div>
-        <div class="footer-links">
+
+        <!-- Servicios -->
+        <div class="footer-col">
+          <h4>Servicios</h4>
+          <a href="#paquetes">Internet Fibra Óptica</a>
+          <a href="#paquetes">TV HD + 4K</a>
+          <a href="#paquetes">Telefonía</a>
+          <a href="#paquetes">Triple Play</a>
+          <a href="#paquetes">Streaming Incluido</a>
+        </div>
+
+        <!-- Navegación -->
+        <div class="footer-col">
           <h4>Navegación</h4>
           <a href="#beneficios">Beneficios</a>
           <a href="#paquetes">Paquetes</a>
@@ -487,24 +555,57 @@
           <a href="#faq">Preguntas Frecuentes</a>
           <a href="#contacto">Contacto</a>
         </div>
-        <div class="footer-schedule">
-          <h4>Horario</h4>
-          <p>Lunes a Sábado<br>9:00 AM — 8:00 PM</p>
+
+        <!-- Contacto -->
+        <div class="footer-col">
+          <h4>Contacto</h4>
+          <div class="footer-contact-item">
+            <i data-lucide="phone"></i>
+            <span id="footer-phone">990 194 5673</span>
+          </div>
+          <div class="footer-contact-item">
+            <i data-lucide="clock"></i>
+            <span>Lun–Sáb 9:00 AM — 8:00 PM</span>
+          </div>
+          <div class="footer-contact-item">
+            <i data-lucide="map-pin"></i>
+            <span>Mérida, Yucatán, México</span>
+          </div>
+          <a href="#contacto" class="btn btn-whatsapp btn-sm footer-wa-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+            </svg>
+            Escríbenos por WhatsApp
+          </a>
         </div>
+
       </div>
+
+      <!-- Footer Bottom -->
       <div class="footer-bottom">
-        <span>© 2026 Totalplay Mérida — Distribuidor Autorizado. Todos los derechos reservados.</span>
-        <span>Hecho con ❤️ en Mérida, Yucatán</span>
+        <div class="footer-bottom-left">
+          <span>© 2026 Totalplay Mérida — Distribuidor Autorizado</span>
+          <span class="footer-sep">·</span>
+          <span>Todos los derechos reservados</span>
+        </div>
+        <div class="footer-bottom-right">
+          <span>Hecho con <i data-lucide="heart" class="icon-heart"></i> en Mérida, Yucatán</span>
+        </div>
       </div>
     </div>
   </footer>
 
   <!-- ========== FLOATING WHATSAPP ========== -->
   <a href="#" class="whatsapp-float" id="whatsapp-float" target="_blank" rel="noopener" aria-label="WhatsApp">
-    💬
+    <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
+      <path
+        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
   </a>
 
   <!-- Scripts -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="js/paquetes.js?v=2"></script>
   <script src="js/main.js?v=2"></script>
 </body>
