@@ -72,7 +72,8 @@ function renderPackages() {
     grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--gray-400);">No hay paquetes disponibles en esta categoría en este momento.</p>';
   } else {
     grid.innerHTML = filtered.map(pkg => {
-      const waMsg = `¡Hola! Me interesa el paquete *${pkg.name}* ($${pkg.price}/mes, ${pkg.speed} Mbps). ¿Me pueden dar más información?`;
+      const speedFormatted = pkg.speed.toLocaleString('en-US');
+      const waMsg = `¡Hola! Me interesa el paquete *${pkg.name}* ($${pkg.price}/mes, ${speedFormatted} Mbps). ¿Me pueden dar más información?`;
       const waURL = buildWhatsAppURL(contact, waMsg);
       const listPrice = pkg.listPrice || (pkg.price + 50);
       const loyaltyPrice = pkg.loyaltyPrice || (pkg.price - 30);
@@ -98,7 +99,7 @@ function renderPackages() {
           ${pkg.badge ? `<div class="pkg-custom-badge">${pkg.badge}</div>` : ''}
 
           <div class="pkg-speed-hero">
-            <span class="speed-number">${pkg.speed}</span>
+            <span class="speed-number">${speedFormatted}</span>
             <div class="speed-meta">
               <span class="speed-unit">Mbps</span>
               <span class="speed-type">Simétricos</span>
