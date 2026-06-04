@@ -1022,7 +1022,7 @@ select.form-control {
    PROMO IMAGE SECTION
    ==================================================== */
 .promo-img-section {
-  padding: 0 0 64px;
+  padding: 64px 0;
   background: var(--black);
 }
 
